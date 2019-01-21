@@ -47,6 +47,10 @@ namespace Klyte.VehicleWealthizer.UI
 
             SetPreviewWindow();
             CreateRemoveUnwantedButton();
+
+            VWUtils.createUIElement(out UIPanel exportPanel, m_mainPanel.transform, "ImportExportPanel", new Vector4(480,275,380,275));
+            exportPanel.gameObject.AddComponent<VWConfigFilesPanel>();
+
         }
 
         private void OnOpenClosePanel(UIComponent component, bool value)
@@ -167,8 +171,9 @@ namespace Klyte.VehicleWealthizer.UI
             m_previewRenderer.cameraRotation = 40;
 
             VWUtils.createUIElement(out m_previewTitle, m_mainPanel.transform, "previewTitle", new Vector4(510, 50, m_previewPanel.width, 30));
+            m_previewTitle.textAlignment = UIHorizontalAlignment.Center;
         }
-        
+
         public void RotateCamera()
         {
             if (m_lastInfo != default(VehicleInfo) && m_previewPanel.isVisible)

@@ -10,11 +10,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static Citizen;
+using System.Reflection;
+using System.Text;
 
 namespace Klyte.VehicleWealthizer.Extensors
 {
     internal interface IVWVehiclesWealthExtension : IVWAssetSelectorExtension
     {
+        string[] Serialize();
+        void Deserialize(string[] lines);
     }
 
     internal abstract class VWVehiclesWealthExtension<W, SG> : ExtensionInterfaceSingleImpl<VWConfigWarehouse, VWConfigWarehouse.ConfigIndex, ExtConfigs, SG>, IVWVehiclesWealthExtension where W : VWWthDef<W>, new() where SG : VWVehiclesWealthExtension<W, SG>
@@ -133,7 +137,43 @@ namespace Klyte.VehicleWealthizer.Extensors
         {
             basicAssetsList = VWUtils.LoadBasicAssets(definition);
         }
+
         #endregion
+
+
+        #region Serialization
+        public abstract string serializePrefix { get; }
+
+        public string[] Serialize()
+        {
+            return GetAssetList().Select(x => $"{serializePrefix} {x}").ToArray();
+        }
+
+        public void Deserialize(string[] lines)
+        {
+            List<string> selectedModels = new List<string>();
+            foreach (string line in lines)
+            {
+                if (line.StartsWith($"{serializePrefix} "))
+                {
+                    selectedModels.Add(line.Replace($"{serializePrefix} ", ""));
+                }
+            }
+            if (basicAssetsList == null) LoadBasicAssets();
+            var resultList = basicAssetsList.Where(x => selectedModels.Contains(x) || selectedModels.Contains(x.Split(".".ToCharArray())[0])).ToArray();
+            VWUtils.doLog($"IMPORTED: {resultList.Length} assets for {typeof(W)} => {resultList}");
+            if (resultList.Length == 0)
+            {
+                SafeCleanProperty(ExtConfigs.MODELS);
+            }
+            else
+            {
+                SafeSet(ExtConfigs.MODELS, string.Join(ItSepLvl3, resultList));
+            }
+
+        }
+        #endregion
+
 
 
     }
@@ -157,12 +197,48 @@ namespace Klyte.VehicleWealthizer.Extensors
     }
 
 
-    internal sealed class VWVehiclesWealthExtensionLow : VWVehiclesWealthExtension<VWWthDefLow, VWVehiclesWealthExtensionLow> { }
-    internal sealed class VWVehiclesWealthExtensionMed : VWVehiclesWealthExtension<VWWthDefMed, VWVehiclesWealthExtensionMed> { }
-    internal sealed class VWVehiclesWealthExtensionHgh : VWVehiclesWealthExtension<VWWthDefHgh, VWVehiclesWealthExtensionHgh> { }
+    internal sealed class VWVehiclesWealthExtensionLow : VWVehiclesWealthExtension<VWWthDefLow, VWVehiclesWealthExtensionLow> { public override string serializePrefix => "§"; }
+    internal sealed class VWVehiclesWealthExtensionMed : VWVehiclesWealthExtension<VWWthDefMed, VWVehiclesWealthExtensionMed> { public override string serializePrefix => "§§"; }
+    internal sealed class VWVehiclesWealthExtensionHgh : VWVehiclesWealthExtension<VWWthDefHgh, VWVehiclesWealthExtensionHgh> { public override string serializePrefix => "§§§"; }
 
     public sealed class VWVehicleExtensionUtils
     {
+
+        public static string GenerateSerializedFile()
+        {
+            StringBuilder result = new StringBuilder();
+            var typeTarg = typeof(VWVehiclesWealthExtension<,>);
+            var instances = from t in Assembly.GetAssembly(typeof(VWVehicleExtensionUtils)).GetTypes()
+                            let y = t.BaseType
+                            where t.IsClass && !t.IsAbstract && y != null && y.IsGenericType && y.GetGenericTypeDefinition() == typeTarg
+                            select t;
+
+            foreach (Type t in instances)
+            {
+                IVWVehiclesWealthExtension ext = (IVWVehiclesWealthExtension)GameObject.FindObjectOfType(t);
+                result.AppendLine(string.Join("\r\n", ext.Serialize()));
+            }
+
+            return result.ToString();
+        }
+
+        public static void DeserializeGeneratedFile(string fileContent)
+        {
+            string[] lines = fileContent.Split("\r\n".ToCharArray());
+
+            StringBuilder result = new StringBuilder();
+            var typeTarg = typeof(VWVehiclesWealthExtension<,>);
+            var instances = from t in Assembly.GetAssembly(typeof(VWVehicleExtensionUtils)).GetTypes()
+                            let y = t.BaseType
+                            where t.IsClass && !t.IsAbstract && y != null && y.IsGenericType && y.GetGenericTypeDefinition() == typeTarg
+                            select t;
+
+            foreach (Type t in instances)
+            {
+                IVWVehiclesWealthExtension ext = (IVWVehiclesWealthExtension)GameObject.FindObjectOfType(t);
+                ext.Deserialize(lines);
+            }
+        }
 
         public static void RemoveAllUnwantedVehicles()
         {

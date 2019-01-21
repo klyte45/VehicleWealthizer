@@ -13,7 +13,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-[assembly: AssemblyVersion("0.1.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
 namespace Klyte.VehicleWealthizer
 {
     public class VehicleWealthizerMod : IUserMod, ILoadingExtension
@@ -89,12 +89,10 @@ namespace Klyte.VehicleWealthizer
     {
         public static readonly string FOLDER_NAME = "VehicleWealthizer";
         public static readonly string FOLDER_PATH = VWUtils.BASE_FOLDER_PATH + FOLDER_NAME;
-        public const string PALETTE_SUBFOLDER_NAME = "ColorPalettes";
-        public const string EXPORTED_MAPS_SUBFOLDER_NAME = "ExportedMaps";
+        public const string IMPORT_EXPORT_SUBFOLDER_NAME = "ImportExportVehicleWealth";
 
-        public static string palettesFolder => FOLDER_PATH + Path.DirectorySeparatorChar + PALETTE_SUBFOLDER_NAME;
+        public static string importExportWealthFolder => FOLDER_PATH + Path.DirectorySeparatorChar + IMPORT_EXPORT_SUBFOLDER_NAME;
         public static string configsFolder => VWConfigWarehouse.CONFIG_PATH;
-        public static string exportedMapsFolder => FOLDER_PATH + Path.DirectorySeparatorChar + EXPORTED_MAPS_SUBFOLDER_NAME;
 
         public static string minorVersion
         {
@@ -171,6 +169,7 @@ namespace Klyte.VehicleWealthizer
         {
             Debug.LogWarningFormat("VWv" + VWSingleton.majorVersion + " LOADING TLM ");
             VWUtils.EnsureFolderCreation(configsFolder);
+            VWUtils.EnsureFolderCreation(importExportWealthFolder);
             string currentConfigPath = PathUtils.AddExtension(VWConfigWarehouse.CONFIG_PATH + VWConfigWarehouse.CONFIG_FILENAME + "_" + VWConfigWarehouse.GLOBAL_CONFIG_INDEX, GameSettings.extension);
             if (!File.Exists(currentConfigPath))
             {
@@ -194,7 +193,6 @@ namespace Klyte.VehicleWealthizer
             if (instance != null) GameObject.Destroy(instance);
             loadVWLocale(false);
 
-            var fipalette = VWUtils.EnsureFolderCreation(palettesFolder);
             onAwake?.Invoke();
         }
 

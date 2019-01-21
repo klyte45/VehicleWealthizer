@@ -115,7 +115,7 @@ namespace Klyte.VehicleWealthizer
 
         public void Start()
         {
-            KlyteModsPanel.instance.AddTab(ModTab.VehicleWealthier, typeof(VWPanel), taVW, "VWIcon", "Vehicle Wealthier (v" + VWSingleton.version + ")").width = 500;
+            KlyteModsPanel.instance.AddTab(ModTab.VehicleWealthier, typeof(VWPanel), taVW, "VWIcon", "Vehicle Wealthizer (v" + VWSingleton.version + ")").width = 500;
         }
 
         public void OpenVWPanel()

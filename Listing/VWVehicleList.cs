@@ -46,7 +46,12 @@ namespace Klyte.VehicleWealthizer.Listing
             }
         }
 
-        private void AddToList(string infoName, ref int count)
+        public void Invalidate()
+        {
+            m_LinesUpdated = false;
+        }
+
+        private VWBuildingInfoItem AddToList(string infoName, ref int count)
         {
             VWBuildingInfoItem buildingInfoItem;
             if (count >= mainPanel.components.Count)
@@ -63,6 +68,7 @@ namespace Klyte.VehicleWealthizer.Listing
             buildingInfoItem.prefabName = infoName;
             buildingInfoItem.RefreshData();
             count++;
+            return buildingInfoItem;
         }
 
         public void RefreshLines()
@@ -73,7 +79,7 @@ namespace Klyte.VehicleWealthizer.Listing
             VWUtils.doLog("{0} vehicleList = [{1}] (s={2})", GetType(), string.Join(",", vehicleList.Select(x => x.ToString()).ToArray()), vehicleList.Count);
             foreach (string prefabName in vehicleList)
             {
-                AddToList(prefabName, ref count);
+                AddToList(prefabName, ref count).RefreshData(true); ;
             }
             RemoveExtraLines(count);
             VWUtils.doLog("{0} final count = {1}", GetType(), count);

@@ -30,6 +30,7 @@
         private Color32 m_BackgroundColor;
 
         private bool m_mouseIsOver;
+        private bool m_isUpdated = false;
 
         public string prefabName
         {
@@ -63,9 +64,9 @@
 
 
 
-        public void RefreshData()
+        public void RefreshData(bool force = false)
         {
-            if (transform.parent.gameObject.GetComponent<UIComponent>().isVisible)
+            if (force || (transform.parent.gameObject.GetComponent<UIComponent>().isVisible && !m_isUpdated))
             {
                 GetComponent<UIComponent>().isVisible = true;
 
@@ -77,6 +78,7 @@
                 m_mediumWealth.isChecked = extM.IsModelSelected(m_prefabName);
                 m_highWealth.isChecked = extH.IsModelSelected(m_prefabName);
 
+                m_isUpdated = transform.parent.gameObject.GetComponent<UIComponent>().isVisible;
             }
         }
 
@@ -184,15 +186,6 @@
 
         private void OnDisable()
         {
-        }
-
-
-        private void OnLineChanged(string id)
-        {
-            if (id == this.m_prefabName)
-            {
-                this.RefreshData();
-            }
         }
 
         private PropertyChangedEventHandler<bool> assetChange<W, SG>() where W : VWWthDef<W>, new() where SG : VWVehiclesWealthExtension<W, SG>

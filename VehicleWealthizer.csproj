@@ -103,6 +103,7 @@
     <Compile Include="Listing\VWVehicleInfoItem.cs" />
     <Compile Include="Overrides\CitizenOverrides.cs" />
     <Compile Include="Listing\VWVehicleList.cs" />
+    <Compile Include="UI\VWConfigFilesPanel.cs" />
     <Compile Include="UI\VWPanel.cs" />
     <Compile Include="VWConfigWarehouse.cs" />
     <Compile Include="VWController.cs" />
