@@ -13,7 +13,7 @@ namespace Klyte.VehicleWealthizer
     internal class VWConfigWarehouse : ConfigWarehouseBase<VWConfigWarehouse.ConfigIndex, VWConfigWarehouse>
     {
         public const string CONFIG_FILENAME = "CityConfigV0";
-        public static readonly string CONFIG_PATH = VWUtils.BASE_FOLDER_PATH + VWSingleton.FOLDER_NAME + Path.DirectorySeparatorChar + "CityConfigs" + Path.DirectorySeparatorChar;
+        public static readonly string CONFIG_PATH = VWUtils.BASE_FOLDER_PATH + VehicleWealthizerMod.FOLDER_NAME + Path.DirectorySeparatorChar + "CityConfigs" + Path.DirectorySeparatorChar;
         public override string ConfigFilename => CONFIG_FILENAME;
         public override string ConfigPath => CONFIG_PATH;
         public const string TRUE_VALUE = "1";

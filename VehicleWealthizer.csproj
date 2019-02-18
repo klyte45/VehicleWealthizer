@@ -103,6 +103,7 @@
     <Compile Include="Listing\VWVehicleInfoItem.cs" />
     <Compile Include="Overrides\CitizenOverrides.cs" />
     <Compile Include="Listing\VWVehicleList.cs" />
+    <Compile Include="TextureAtlas\VWCommonTextureAtlas.cs" />
     <Compile Include="UI\VWConfigFilesPanel.cs" />
     <Compile Include="UI\VWPanel.cs" />
     <Compile Include="VWConfigWarehouse.cs" />
@@ -172,7 +173,7 @@
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y "$(TargetPath)" "$(ProjectDir)\_requiredDLLs\"
-xcopy /Y "$(TargetPath)" "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\VW\"
+xcopy /Y "$(TargetPath)" "Q:\Steam\steamapps\workshop\content\255710\1633580257\"
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

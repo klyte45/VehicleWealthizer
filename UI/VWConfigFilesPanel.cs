@@ -48,7 +48,7 @@ namespace Klyte.VehicleWealthizer.UI
             lblTitle.maximumSize = Vector2.zero;
             lblTitle.wordWrap = false;
             VWUtils.LimitWidth(lblTitle, (uint)(controlContainer.width - 10));
-            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("VW_OPEN_FOLDER_IMPORT_EXPORT"), () => { ColossalFramework.Utils.OpenInFileBrowser(VWUtils.EnsureFolderCreation(VWSingleton.importExportWealthFolder).FullName); }), (uint)(controlContainer.width - 10));
+            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("VW_OPEN_FOLDER_IMPORT_EXPORT"), () => { ColossalFramework.Utils.OpenInFileBrowser(VWUtils.EnsureFolderCreation(VehicleWealthizerMod.importExportWealthFolder).FullName); }), (uint)(controlContainer.width - 10));
 
             VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("VW_RELOAD_IMPORT_FILES"), ReloadImportFiles), (uint)(controlContainer.width - 10));
             m_ddImport = group1.AddDropdown(Locale.Get("VW_SELECT_FILE_IMPORT"), new string[0], "", (x) => { m_btnImport.isEnabled = (x >= 0); });
@@ -82,10 +82,10 @@ namespace Klyte.VehicleWealthizer.UI
         private void ReloadImportFiles()
         {
             m_importFiles = new Dictionary<string, string>();
-            foreach (var filename in Directory.GetFiles(VWSingleton.importExportWealthFolder, "*" + EXT_CONF).Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+            foreach (var filename in Directory.GetFiles(VehicleWealthizerMod.importExportWealthFolder, "*" + EXT_CONF).Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
             {
                 var name = filename.Substring(0, filename.Length - EXT_CONF.Length);
-                m_importFiles[name] = VWSingleton.importExportWealthFolder + Path.DirectorySeparatorChar + filename;
+                m_importFiles[name] = VehicleWealthizerMod.importExportWealthFolder + Path.DirectorySeparatorChar + filename;
             }
             m_ddImport.items = m_importFiles.Keys.ToArray();
         }
@@ -101,7 +101,7 @@ namespace Klyte.VehicleWealthizer.UI
         {
             string contents = VWVehicleExtensionUtils.GenerateSerializedFile();
             string filename = $"{SimulationManager.instance.m_metaData.m_CityName} - {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}";
-            File.WriteAllText(VWSingleton.importExportWealthFolder + Path.DirectorySeparatorChar + filename + EXT_CONF, contents);
+            File.WriteAllText(VehicleWealthizerMod.importExportWealthFolder + Path.DirectorySeparatorChar + filename + EXT_CONF, contents);
             ReloadImportFiles();
             m_ddImport.selectedValue = filename;
             VWVehicleList.instance.Invalidate();

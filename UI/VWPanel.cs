@@ -4,6 +4,7 @@ using Klyte.Commons.UI;
 using Klyte.Commons.Utils;
 using Klyte.VehicleWealthizer.Extensors;
 using Klyte.VehicleWealthizer.Listing;
+using Klyte.VehicleWealthizer.TextureAtlas;
 using Klyte.VehicleWealthizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ namespace Klyte.VehicleWealthizer.UI
             SetPreviewWindow();
             CreateRemoveUnwantedButton();
 
-            VWUtils.createUIElement(out UIPanel exportPanel, m_mainPanel.transform, "ImportExportPanel", new Vector4(480,275,380,275));
+            VWUtils.createUIElement(out UIPanel exportPanel, m_mainPanel.transform, "ImportExportPanel", new Vector4(480, 275, 380, 275));
             exportPanel.gameObject.AddComponent<VWConfigFilesPanel>();
 
         }
@@ -57,7 +58,7 @@ namespace Klyte.VehicleWealthizer.UI
         {
             if (value)
             {
-                VWSingleton.instance.showVersionInfoPopup();
+                VehicleWealthizerMod.instance.showVersionInfoPopup();
             }
         }
 
@@ -98,12 +99,12 @@ namespace Klyte.VehicleWealthizer.UI
         {
             VWUtils.createUIElement(out UILabel titlebar, m_mainPanel.transform, "VWPanel", new Vector4(75, 10, m_mainPanel.width - 150, 20));
             titlebar.autoSize = false;
-            titlebar.text = "Vehicle Wealthizer v" + VWSingleton.version;
+            titlebar.text = "Vehicle Wealthizer v" + VehicleWealthizerMod.version;
             titlebar.textAlignment = UIHorizontalAlignment.Center;
             VWUtils.createDragHandle(titlebar, KlyteModsPanel.instance.mainPanel);
 
             VWUtils.createUIElement(out UISprite logo, m_mainPanel.transform, "VWLogo", new Vector4(22, 5f, 32, 32));
-            logo.atlas = VWController.taVW;
+            logo.atlas = VWCommonTextureAtlas.instance.atlas;
             logo.spriteName = "VWIcon";
             VWUtils.createDragHandle(logo, KlyteModsPanel.instance.mainPanel);
         }
@@ -132,7 +133,7 @@ namespace Klyte.VehicleWealthizer.UI
 
             var icon = removeUndesired.AddUIComponent<UISprite>();
             icon.relativePosition = new Vector3(2, 2);
-            icon.atlas = VWController.taVW;
+            icon.atlas = VWCommonTextureAtlas.instance.atlas;
             icon.width = 18;
             icon.height = 18;
             icon.spriteName = "RemoveUnwantedIcon";

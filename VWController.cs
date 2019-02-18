@@ -4,6 +4,7 @@ using ColossalFramework.UI;
 using Klyte.Commons;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.UI;
+using Klyte.VehicleWealthizer.TextureAtlas;
 using Klyte.VehicleWealthizer.UI;
 using Klyte.VehicleWealthizer.Utils;
 using System;
@@ -18,20 +19,6 @@ namespace Klyte.VehicleWealthizer
 {
     internal class VWController : Singleton<VWController>
     {
-
-        public static UITextureAtlas taVW
-        {
-            get {
-                if (_taVW == null)
-                {
-                    VWResourceLoader.Ensure();
-                    _taVW = VWResourceLoader.instance.CreateTextureAtlas("UI.Images.sprites.png", "TransportLinesManagerSprites", GameObject.FindObjectOfType<UIPanel>().atlas.material, 64, 64, new string[] {
-                    "VWIcon","AutoNameIcon","AutoColorIcon","RemoveUnwantedIcon","ConfigIcon","24hLineIcon", "PerHourIcon","AbsoluteMode","RelativeMode"
-                });
-                }
-                return _taVW;
-            }
-        }
 
         private static UITextureAtlas _taVW = null;
 
@@ -84,8 +71,6 @@ namespace Klyte.VehicleWealthizer
         {
             if (!initialized && gameObject != null)
             {
-                VWSingleton.instance.loadVWLocale(false);
-
                 uiView = GameObject.FindObjectOfType<UIView>();
                 if (!uiView)
                     return;
@@ -115,7 +100,7 @@ namespace Klyte.VehicleWealthizer
 
         public void Start()
         {
-            KlyteModsPanel.instance.AddTab(ModTab.VehicleWealthier, typeof(VWPanel), taVW, "VWIcon", "Vehicle Wealthizer (v" + VWSingleton.version + ")").width = 500;
+            KlyteModsPanel.instance.AddTab(ModTab.VehicleWealthier, typeof(VWPanel), VWCommonTextureAtlas.instance.atlas, "VWIcon", "Vehicle Wealthizer (v" + VehicleWealthizerMod.version + ")").width = 500;
         }
 
         public void OpenVWPanel()

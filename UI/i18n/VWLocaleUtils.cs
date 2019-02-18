@@ -5,11 +5,10 @@ using System;
 
 namespace Klyte.VehicleWealthizer.i18n
 {
-    internal class VWLocaleUtils : KlyteLocaleUtils<VWLocaleUtils, VWResourceLoader>
+    public class VWLocaleUtils : KlyteLocaleUtils<VWLocaleUtils, VWResourceLoader>
     {
-        protected override string[] locales => new string[] { "en", "pt" };
 
-        protected override string prefix => "VW_";
+        public override string prefix => "VW_";
 
         protected override string packagePrefix => "Klyte.VehicleWealthizer";
     }
