@@ -133,7 +133,7 @@ namespace Klyte.VehicleWealthizer.Extensors
         internal abstract CitizenWealthDefinition GetCWD();
         public void Awake()
         {
-            this.transform.SetParent(VWController.instance.transform);
+            this.transform.SetParent(VehicleWealthizerMod.instance.refTransform);
         }
     }
     internal sealed class VWWthDefLow : VWWthDef<VWWthDefLow> { internal override CitizenWealthDefinition GetCWD() { return CitizenWealthDefinition.LOW; } }

@@ -6,7 +6,10 @@ using ColossalFramework.UI;
 using ICities;
 using Klyte.Commons.Extensors;
 using Klyte.Commons.Interfaces;
+using Klyte.Commons.UI;
 using Klyte.VehicleWealthizer.i18n;
+using Klyte.VehicleWealthizer.TextureAtlas;
+using Klyte.VehicleWealthizer.UI;
 using Klyte.VehicleWealthizer.Utils;
 using System;
 using System.IO;
@@ -17,7 +20,7 @@ using UnityEngine;
 [assembly: AssemblyVersion("1.0.0.9999")]
 namespace Klyte.VehicleWealthizer
 {
-    public class VehicleWealthizerMod : BasicIUserMod<VehicleWealthizerMod, VWLocaleUtils, VWResourceLoader>
+    public class VehicleWealthizerMod : BasicIUserMod<VehicleWealthizerMod, VWLocaleUtils, VWResourceLoader, MonoBehaviour, VWCommonTextureAtlas, VWPanel>
     {
 
         public static readonly string FOLDER_NAME = "VehicleWealthizer";
@@ -25,6 +28,9 @@ namespace Klyte.VehicleWealthizer
         public const string IMPORT_EXPORT_SUBFOLDER_NAME = "ImportExportVehicleWealth";
         public static string importExportWealthFolder => FOLDER_PATH + Path.DirectorySeparatorChar + IMPORT_EXPORT_SUBFOLDER_NAME;
         public static string configsFolder => VWConfigWarehouse.CONFIG_PATH;
+
+        protected override ModTab? Tab => ModTab.VehicleWealthizer;
+        protected override float? TabWidth => 500;
 
 
         public override string SimpleName => "Vehicle Wealthizer";
@@ -45,33 +51,6 @@ namespace Klyte.VehicleWealthizer
         {
             VWUtils.EnsureFolderCreation(configsFolder);
             VWUtils.EnsureFolderCreation(importExportWealthFolder);
-        }
-
-        public override void OnCreated(ILoading loading)
-        {
-        }
-
-        public override void OnLevelLoaded(LoadMode mode)
-        {
-            VWUtils.doLog("LEVEL LOAD");
-            if (mode != LoadMode.LoadGame && mode != LoadMode.NewGame && mode != LoadMode.NewGameFromScenario)
-            {
-                VWUtils.doLog("NOT GAME ({0})", mode);
-                return;
-            }
-
-            Assembly asm = Assembly.GetAssembly(typeof(VehicleWealthizerMod));
-            Type[] types = asm.GetTypes();
-
-            VWController.instance.Awake();
-        }
-
-        public override void OnLevelUnloading()
-        {
-        }
-
-        public override void OnReleased()
-        {
         }
 
         public override void TopSettingsUI(UIHelperExtension helper)

@@ -31,10 +31,8 @@ namespace Klyte.VehicleWealthizer.Extensors
         public override VWConfigWarehouse.ConfigIndex ConfigIndexKey
         {
             get {
-                if (transform.parent == null && VWController.instance != null)
-                {
-                    transform.SetParent(VWController.instance.transform);
-                }
+                transform.SetParent(VehicleWealthizerMod.instance.refTransform);
+
                 var def = definition;
                 return VWConfigWarehouse.getConfigAssetsForDef(ref def);
             }
@@ -47,7 +45,7 @@ namespace Klyte.VehicleWealthizer.Extensors
 
         public void Awake()
         {
-            this.transform.SetParent(VWController.instance.transform);
+            this.transform.SetParent(VehicleWealthizerMod.instance.refTransform);
         }
 
         #region Asset List

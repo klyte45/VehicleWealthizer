@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Klyte.VehicleWealthizer.UI
 {
 
-    internal class VWPanel : UICustomControl
+    public class VWPanel : UICustomControl
     {
         private const int NUM_SERVICES = 0;
         private static VWPanel m_instance;

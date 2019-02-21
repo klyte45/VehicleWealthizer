@@ -107,7 +107,6 @@
     <Compile Include="UI\VWConfigFilesPanel.cs" />
     <Compile Include="UI\VWPanel.cs" />
     <Compile Include="VWConfigWarehouse.cs" />
-    <Compile Include="VWController.cs" />
     <Compile Include="UI\i18n\VWLocaleUtils.cs" />
     <Compile Include="Utils\ResourceLoader.cs" />
     <Compile Include="Utils\VWUtils.cs" />

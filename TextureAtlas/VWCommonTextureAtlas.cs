@@ -18,7 +18,7 @@ namespace Klyte.VehicleWealthizer.TextureAtlas
     {
         protected override string ResourceName => "UI.Images.sprites.png";
         protected override string CommonName => "VehicleWealthizerSprites";
-        protected override string[] SpriteNames => new string[] {
+        public override string[] SpriteNames => new string[] {
                      "VWIcon","AutoNameIcon","AutoColorIcon","RemoveUnwantedIcon","ConfigIcon","24hLineIcon", "PerHourIcon","AbsoluteMode","RelativeMode"
                 };
     }
