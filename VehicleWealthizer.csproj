@@ -152,10 +152,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Harmony-master\Harmony\Harmony.csproj">
-      <Project>{69aee16a-b6e7-4642-8081-3928b32455df}</Project>
-      <Name>Harmony</Name>
-    </ProjectReference>
     <ProjectReference Include="..\KlyteCommons\KlyteCommons.csproj">
       <Project>{fbc8ec78-6489-4b4c-8d94-f455d37d3274}</Project>
       <Name>KlyteCommons</Name>
