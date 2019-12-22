@@ -7,10 +7,11 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{01F8B98D-0F1E-42FB-9517-77A637608D01}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Klyte.VehicleWealthizer</RootNamespace>
+    <RootNamespace>Klyte</RootNamespace>
     <AssemblyName>VehicleWealthizer</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>True</DebugSymbols>
@@ -45,8 +46,27 @@
     <StartupObject>
     </StartupObject>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>..\ServiceVehiclesManager\ServiceVehiclesManager.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>..\ServiceVehiclesManager\ServiceVehiclesManager.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <Folder Include="Commons\Properties\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ProjectExtensions>
@@ -98,17 +118,46 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
+    <Compile Include="Commons\Extensors\Redirector.cs" />
+    <Compile Include="Commons\Extensors\UI\NumberedColorList.cs" />
+    <Compile Include="Commons\Extensors\UI\TextList.cs" />
+    <Compile Include="Commons\Extensors\UI\UIDropDownColorSelector.cs" />
+    <Compile Include="Commons\Extensors\UI\UIHelperExtended.cs" />
+    <Compile Include="Commons\Extensors\UI\UITabstripAutoResize.cs" />
+    <Compile Include="Commons\Interfaces\BasicExtensionInterface.cs" />
+    <Compile Include="Commons\Interfaces\BasicIUserMod.cs" />
+    <Compile Include="Commons\Interfaces\ConfigWarehouseBase.cs" />
+    <Compile Include="Commons\Interfaces\ExtensionInterfaceDictionaryImpl.cs" />
+    <Compile Include="Commons\Interfaces\ExtensionInterfaceListImpl .cs" />
+    <Compile Include="Commons\Interfaces\ExtensionInterfaceSingleImpl.cs" />
+    <Compile Include="Commons\Interfaces\TextureAtlasDescriptor.cs" />
+    <Compile Include="Commons\Overrides\BuildingManagerOverrides.cs" />
+    <Compile Include="Commons\Overrides\DistrictManagerOverrides.cs" />
+    <Compile Include="Commons\Overrides\InstanceManagerOverrides.cs" />
+    <Compile Include="Commons\Overrides\NetManagerOverrides.cs" />
+    <Compile Include="Commons\Overrides\PublicTransportDetailPanelHooks.cs" />
+    <Compile Include="Commons\Overrides\TransportManagerOverrides.cs" />
+    <Compile Include="Commons\TextureAtlas\LineUtilsTextureAtlas.cs" />
+    <Compile Include="Commons\Tools\BasicNetTool.cs" />
+    <Compile Include="Commons\UI\AVOPreviewRenderer.cs" />
+    <Compile Include="Commons\UI\i18n\KlyteLocaleUtils.cs" />
+    <Compile Include="Commons\UI\TLMAgesChartPanel.cs" />
+    <Compile Include="Commons\UI\TLMWorkersChartPanel.cs" />
+    <Compile Include="Commons\Utils\CardinalPoint .cs" />
+    <Compile Include="Commons\Utils\KlyteResourceLoader.cs" />
+    <Compile Include="Commons\Utils\KlyteUtils.cs" />
+    <Compile Include="Commons\Utils\ReflectionUtils.cs" />
     <Compile Include="Extensions\CitizenWealthDefinition.cs" />
     <Compile Include="Extensions\VWVehiclesWealthExtension.cs" />
     <Compile Include="Listing\VWVehicleInfoItem.cs" />
     <Compile Include="Overrides\CitizenOverrides.cs" />
     <Compile Include="Listing\VWVehicleList.cs" />
+    <Compile Include="TextureAtlas\CommonTextureAtlas.cs" />
     <Compile Include="TextureAtlas\VWCommonTextureAtlas.cs" />
     <Compile Include="UI\VWConfigFilesPanel.cs" />
     <Compile Include="UI\VWPanel.cs" />
-    <Compile Include="VWConfigWarehouse.cs" />
-    <Compile Include="UI\i18n\VWLocaleUtils.cs" />
     <Compile Include="Utils\ResourceLoader.cs" />
+    <Compile Include="VWConfigWarehouse.cs" />
     <Compile Include="Utils\VWUtils.cs" />
     <Compile Include="VehicleWealthizer.cs" />
   </ItemGroup>
@@ -116,11 +165,16 @@
     <EmbeddedResource Include="UI\VersionNotes.txt" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="UI\Images\spritesCommon.png" />
     <EmbeddedResource Include="UI\Images\sprites.png" />
-    <EmbeddedResource Include="TLMVersion.txt" />
+    <EmbeddedResource Include="Commons\UI\Images\lineFormat.png" />
+    <Content Include="Commons\UI\VersionNotes.txt" />
     <Content Include="UI\Images\sprites.psd" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\TransportLinesManager\packages\Lib.Harmony.1.2.0.1\lib\net35\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -132,10 +186,6 @@
     </Reference>
     <Reference Include="ICities">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Posix, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files (x86)\Steam\SteamApps\common\Cities_Skylines\Cities_Data\Managed\Mono.Posix.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -152,26 +202,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\KlyteCommons\KlyteCommons.csproj">
-      <Project>{fbc8ec78-6489-4b4c-8d94-f455d37d3274}</Project>
-      <Name>KlyteCommons</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="UI\i18n\pt.properties" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="UI\i18n\en.properties" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Commons\UI\i18n\en.properties" />
+    <None Include="Commons\UI\i18n\fr.properties" />
+    <None Include="Commons\UI\i18n\pt.properties" />
+    <None Include="Commons\UI\i18n\ru.properties" />
+    <None Include="Commons\UI\Images\lineFormat.psd" />
+    <None Include="packages.config" />
     <None Include="updateVersionTLM.bat" />
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(TargetPath)" "$(ProjectDir)\_requiredDLLs\"
-xcopy /Y "$(TargetPath)" "Q:\Steam\steamapps\workshop\content\255710\1633580257\"
-</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y "$(TargetDir)0Harmony.dll" "$(ProjectDir)\_requiredDLLs\"
+xcopy /Y "$(TargetPath)" "$(ProjectDir)\_requiredDLLs"
+xcopy /Y "$(ProjectDir)\_requiredDLLs\*" "S:\Steam\steamapps\workshop\content\255710\1633580257\"
+
+xcopy /Y "$(ProjectDir)\_requiredDLLs\*" "C:\Users\Leandro\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\VW\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>call $(ProjectDir)updateVersionTLM.bat "$(ProjectDir)\..\KlyteCommons\_requiredDLLs\0KlyteCommons$(TargetExt)" $(ProjectDir)</PreBuildEvent>
+    <PreBuildEvent>del /Q "S:\Steam\steamapps\workshop\content\255710\1633580257\*"</PreBuildEvent>
   </PropertyGroup>
 </Project>

@@ -125,6 +125,7 @@
             GameObject.Destroy(base.Find<UILabel>("LineVehicles"));
             GameObject.Destroy(base.Find<UIButton>("ViewLine"));
             GameObject.Destroy(base.Find<UIButton>("DeleteLine"));
+            GameObject.Destroy(base.Find<UIPanel>("LineModelSelectorContainer"));
 
             this.m_lowWealth = base.Find<UICheckBox>("DayLine");
             this.m_mediumWealth = base.Find<UICheckBox>("NightLine");

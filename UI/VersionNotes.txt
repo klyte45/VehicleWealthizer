@@ -1,1 +1,5 @@
-﻿v1 - Initial Release
+﻿v1.1
+	- REMOVED KLYTE COMMONS DEPENDENCY
+	- New 5th Gen mod icon
+	- Campus update (finally!)
+	- Minor UI fixes

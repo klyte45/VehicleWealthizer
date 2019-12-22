@@ -42,20 +42,20 @@ namespace Klyte.VehicleWealthizer.UI
             controlContainer.clipChildren = true;
             var group1 = new UIHelperExtension(controlContainer);
 
-            var lblTitle = group1.AddLabel(Locale.Get("VW_IMPORT_EXPORT_TITLE"));
+            var lblTitle = group1.AddLabel(Locale.Get("K45_VW_IMPORT_EXPORT_TITLE"));
             lblTitle.autoSize = true;
             lblTitle.minimumSize = Vector2.zero;
             lblTitle.maximumSize = Vector2.zero;
             lblTitle.wordWrap = false;
             VWUtils.LimitWidth(lblTitle, (uint)(controlContainer.width - 10));
-            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("VW_OPEN_FOLDER_IMPORT_EXPORT"), () => { ColossalFramework.Utils.OpenInFileBrowser(VWUtils.EnsureFolderCreation(VehicleWealthizerMod.importExportWealthFolder).FullName); }), (uint)(controlContainer.width - 10));
+            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("K45_VW_OPEN_FOLDER_IMPORT_EXPORT"), () => { ColossalFramework.Utils.OpenInFileBrowser(VWUtils.EnsureFolderCreation(VehicleWealthizerMod.importExportWealthFolder).FullName); }), (uint)(controlContainer.width - 10));
 
-            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("VW_RELOAD_IMPORT_FILES"), ReloadImportFiles), (uint)(controlContainer.width - 10));
-            m_ddImport = group1.AddDropdown(Locale.Get("VW_SELECT_FILE_IMPORT"), new string[0], "", (x) => { m_btnImport.isEnabled = (x >= 0); });
+            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("K45_VW_RELOAD_IMPORT_FILES"), ReloadImportFiles), (uint)(controlContainer.width - 10));
+            m_ddImport = group1.AddDropdown(Locale.Get("K45_VW_SELECT_FILE_IMPORT"), new string[0], "", (x) => { m_btnImport.isEnabled = (x >= 0); });
             ConfigComponentPanel(m_ddImport);
-            m_btnImport = (UIButton)group1.AddButton(Locale.Get("VW_IMPORT_SELECTED"), Import);
+            m_btnImport = (UIButton)group1.AddButton(Locale.Get("K45_VW_IMPORT_SELECTED"), Import);
             VWUtils.LimitWidth(m_btnImport, (uint)(controlContainer.width - 10));
-            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("VW_EXPORT_CURRENT"), Export), (uint)(controlContainer.width - 10));
+            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("K45_VW_EXPORT_CURRENT"), Export), (uint)(controlContainer.width - 10));
 
             ReloadImportFiles();
             m_btnImport.isEnabled = (m_ddImport.items.Length > 0);

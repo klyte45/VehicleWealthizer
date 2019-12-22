@@ -1,13 +1,11 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Klyte.Commons.UI;
-using Klyte.Commons.Utils;
 using Klyte.VehicleWealthizer.Extensors;
 using Klyte.VehicleWealthizer.Listing;
 using Klyte.VehicleWealthizer.TextureAtlas;
 using Klyte.VehicleWealthizer.Utils;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Klyte.VehicleWealthizer.UI
@@ -34,7 +32,7 @@ namespace Klyte.VehicleWealthizer.UI
             controlContainer.name = "VWPanel";
 
 
-            VWUtils.createUIElement(out UIPanel _mainPanel, GetComponent<UIPanel>().transform, "VWListPanel", new Vector4(0, 0, controlContainer.parent.width, controlContainer.parent.height));
+            VWUtils.createUIElement(out UIPanel _mainPanel, GetComponent<UIPanel>().transform, "VWListPanel", new Vector4(0, 0, 885, controlContainer.parent.height));
             m_mainPanel = _mainPanel;
             m_mainPanel.backgroundSprite = "MenuPanel2";
 
@@ -70,7 +68,7 @@ namespace Klyte.VehicleWealthizer.UI
             modelNameLabel.autoSize = false;
             modelNameLabel.area = new Vector4(0, 10, 175, 18);
             modelNameLabel.textAlignment = UIHorizontalAlignment.Center;
-            modelNameLabel.text = Locale.Get("VW_MODEL_NAME");
+            modelNameLabel.text = Locale.Get("K45_VW_MODEL_NAME");
             modelNameLabel.eventClick += (x, y) => { VWVehicleList.instance.SetSorting(VWVehicleList.SortCriterion.NAME); };
 
             VWUtils.createUIElement(out UILabel lowWealth, titleLine.transform, "lowWealth");
@@ -101,19 +99,14 @@ namespace Klyte.VehicleWealthizer.UI
             titlebar.autoSize = false;
             titlebar.text = "Vehicle Wealthizer v" + VehicleWealthizerMod.version;
             titlebar.textAlignment = UIHorizontalAlignment.Center;
-            VWUtils.createDragHandle(titlebar, KlyteModsPanel.instance.mainPanel);
 
             VWUtils.createUIElement(out UISprite logo, m_mainPanel.transform, "VWLogo", new Vector4(22, 5f, 32, 32));
             logo.atlas = VWCommonTextureAtlas.instance.atlas;
             logo.spriteName = "VWIcon";
-            VWUtils.createDragHandle(logo, KlyteModsPanel.instance.mainPanel);
         }
         #endregion
 
-        private void Update()
-        {
-            RotateCamera();
-        }
+        private void Update() => RotateCamera();
 
         private void CreateRemoveUnwantedButton()
         {
@@ -122,7 +115,7 @@ namespace Klyte.VehicleWealthizer.UI
             removeUndesired.textScale = 0.6f;
             removeUndesired.width = 20;
             removeUndesired.height = 20;
-            removeUndesired.tooltip = Locale.Get("VW_REMOVE_UNWANTED_TOOLTIP");
+            removeUndesired.tooltip = Locale.Get("K45_VW_REMOVE_UNWANTED_TOOLTIP");
             VWUtils.initButton(removeUndesired, true, "ButtonMenu");
             removeUndesired.name = "DeleteLineButton";
             removeUndesired.isVisible = true;
@@ -131,7 +124,7 @@ namespace Klyte.VehicleWealthizer.UI
                 VWVehicleExtensionUtils.RemoveAllUnwantedVehicles();
             };
 
-            var icon = removeUndesired.AddUIComponent<UISprite>();
+            UISprite icon = removeUndesired.AddUIComponent<UISprite>();
             icon.relativePosition = new Vector3(2, 2);
             icon.atlas = VWCommonTextureAtlas.instance.atlas;
             icon.width = 18;
@@ -163,11 +156,11 @@ namespace Klyte.VehicleWealthizer.UI
             m_previewPanel.height = m_previewPanel.width / 2;
             m_previewPanel.relativePosition = new Vector3(510, 80);
             VWUtils.createUIElement(out m_preview, m_previewPanel.transform);
-            this.m_preview.size = m_previewPanel.size;
-            this.m_preview.relativePosition = Vector3.zero;
+            m_preview.size = m_previewPanel.size;
+            m_preview.relativePosition = Vector3.zero;
             VWUtils.createElement(out m_previewRenderer, m_mainPanel.transform);
-            this.m_previewRenderer.size = this.m_preview.size * 2f;
-            this.m_preview.texture = this.m_previewRenderer.texture;
+            m_previewRenderer.size = m_preview.size * 2f;
+            m_preview.texture = m_previewRenderer.texture;
             m_previewRenderer.zoom = 3;
             m_previewRenderer.cameraRotation = 40;
 
@@ -179,7 +172,7 @@ namespace Klyte.VehicleWealthizer.UI
         {
             if (m_lastInfo != default(VehicleInfo) && m_previewPanel.isVisible)
             {
-                this.m_previewRenderer.cameraRotation -= 2;
+                m_previewRenderer.cameraRotation -= 2;
                 redrawModel();
             }
         }
