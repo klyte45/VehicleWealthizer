@@ -1,6 +1,7 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
 using Klyte.Commons.Extensors;
+using Klyte.Commons.Utils;
 using Klyte.VehicleWealthizer.Extensors;
 using Klyte.VehicleWealthizer.Utils;
 using System;
@@ -51,19 +52,19 @@ namespace Klyte.VehicleWealthizer.Listing
             m_LinesUpdated = false;
         }
 
-        private VWBuildingInfoItem AddToList(string infoName, ref int count)
+        private VWVehicleInfoItem AddToList(string infoName, ref int count)
         {
-            VWBuildingInfoItem buildingInfoItem;
+            VWVehicleInfoItem buildingInfoItem;
             if (count >= mainPanel.components.Count)
             {
                 var temp = UITemplateManager.Get<PublicTransportLineInfo>(kLineTemplate).gameObject;
                 GameObject.Destroy(temp.GetComponent<PublicTransportLineInfo>());
-                buildingInfoItem = temp.AddComponent<VWBuildingInfoItem>();
+                buildingInfoItem = temp.AddComponent<VWVehicleInfoItem>();
                 mainPanel.AttachUIComponent(buildingInfoItem.gameObject);
             }
             else
             {
-                buildingInfoItem = mainPanel.components[count].GetComponent<VWBuildingInfoItem>();
+                buildingInfoItem = mainPanel.components[count].GetComponent<VWVehicleInfoItem>();
             }
             buildingInfoItem.prefabName = infoName;
             buildingInfoItem.RefreshData();
@@ -76,13 +77,13 @@ namespace Klyte.VehicleWealthizer.Listing
             int count = 0;
             var vehicleList = VWUtils.LoadBasicAssets(CitizenWealthDefinition.LOW);
 
-            VWUtils.doLog("{0} vehicleList = [{1}] (s={2})", GetType(), string.Join(",", vehicleList.Select(x => x.ToString()).ToArray()), vehicleList.Count);
+            LogUtils.DoLog("{0} vehicleList = [{1}] (s={2})", GetType(), string.Join(",", vehicleList.Select(x => x.ToString()).ToArray()), vehicleList.Count);
             foreach (string prefabName in vehicleList)
             {
                 AddToList(prefabName, ref count).RefreshData(true); ;
             }
             RemoveExtraLines(count);
-            VWUtils.doLog("{0} final count = {1}", GetType(), count);
+            LogUtils.DoLog("{0} final count = {1}", GetType(), count);
             ReSort();
 
             m_LinesUpdated = true;
@@ -114,29 +115,29 @@ namespace Klyte.VehicleWealthizer.Listing
 
         private static int CompareNames(UIComponent left, UIComponent right)
         {
-            VWBuildingInfoItem component = left.GetComponent<VWBuildingInfoItem>();
-            VWBuildingInfoItem component2 = right.GetComponent<VWBuildingInfoItem>();
+            VWVehicleInfoItem component = left.GetComponent<VWVehicleInfoItem>();
+            VWVehicleInfoItem component2 = right.GetComponent<VWVehicleInfoItem>();
             return string.Compare(component.vehicleName, component2.vehicleName, StringComparison.InvariantCulture);
         }
 
         private static int CompareLow(UIComponent left, UIComponent right)
         {
-            VWBuildingInfoItem component = left.GetComponent<VWBuildingInfoItem>();
-            VWBuildingInfoItem component2 = right.GetComponent<VWBuildingInfoItem>();
+            VWVehicleInfoItem component = left.GetComponent<VWVehicleInfoItem>();
+            VWVehicleInfoItem component2 = right.GetComponent<VWVehicleInfoItem>();
             return ((component2.lowWealth) ? 1 : 0).CompareTo(component.lowWealth ? 1 : 0);
         }
 
         private static int CompareMed(UIComponent left, UIComponent right)
         {
-            VWBuildingInfoItem component = left.GetComponent<VWBuildingInfoItem>();
-            VWBuildingInfoItem component2 = right.GetComponent<VWBuildingInfoItem>();
+            VWVehicleInfoItem component = left.GetComponent<VWVehicleInfoItem>();
+            VWVehicleInfoItem component2 = right.GetComponent<VWVehicleInfoItem>();
             return (component2.mediumWealth ? 1 : 0).CompareTo(component.mediumWealth ? 1 : 0);
         }
 
         private static int CompareHgh(UIComponent left, UIComponent right)
         {
-            VWBuildingInfoItem component = left.GetComponent<VWBuildingInfoItem>();
-            VWBuildingInfoItem component2 = right.GetComponent<VWBuildingInfoItem>();
+            VWVehicleInfoItem component = left.GetComponent<VWVehicleInfoItem>();
+            VWVehicleInfoItem component2 = right.GetComponent<VWVehicleInfoItem>();
             return (component2.highWealth ? 1 : 0).CompareTo(component.highWealth ? 1 : 0);
         }
 
@@ -165,7 +166,7 @@ namespace Klyte.VehicleWealthizer.Listing
 
         private void ReSort()
         {
-            VWUtils.Quicksort(mainPanel.components, getSortingMethod(m_LastSortCriterionLines), reverseOrder);
+            SortingUtils.Quicksort(mainPanel.components, getSortingMethod(m_LastSortCriterionLines), reverseOrder);
             mainPanel.Invalidate();
         }
 

@@ -1,11 +1,9 @@
 ﻿using ColossalFramework.Globalization;
 using ColossalFramework.UI;
 using Klyte.Commons.Extensors;
-using Klyte.Commons.UI;
 using Klyte.Commons.Utils;
 using Klyte.VehicleWealthizer.Extensors;
 using Klyte.VehicleWealthizer.Listing;
-using Klyte.VehicleWealthizer.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,20 +40,20 @@ namespace Klyte.VehicleWealthizer.UI
             controlContainer.clipChildren = true;
             var group1 = new UIHelperExtension(controlContainer);
 
-            var lblTitle = group1.AddLabel(Locale.Get("K45_VW_IMPORT_EXPORT_TITLE"));
+            UILabel lblTitle = group1.AddLabel(Locale.Get("K45_VW_IMPORT_EXPORT_TITLE"));
             lblTitle.autoSize = true;
             lblTitle.minimumSize = Vector2.zero;
             lblTitle.maximumSize = Vector2.zero;
             lblTitle.wordWrap = false;
-            VWUtils.LimitWidth(lblTitle, (uint)(controlContainer.width - 10));
-            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("K45_VW_OPEN_FOLDER_IMPORT_EXPORT"), () => { ColossalFramework.Utils.OpenInFileBrowser(VWUtils.EnsureFolderCreation(VehicleWealthizerMod.importExportWealthFolder).FullName); }), (uint)(controlContainer.width - 10));
+            KlyteMonoUtils.LimitWidth(lblTitle, (uint) (controlContainer.width - 10));
+            KlyteMonoUtils.LimitWidth((UIButton) group1.AddButton(Locale.Get("K45_VW_OPEN_FOLDER_IMPORT_EXPORT"), () => { ColossalFramework.Utils.OpenInFileBrowser(FileUtils.EnsureFolderCreation(VehicleWealthizerMod.ImportExportWealthFolder).FullName); }), (uint) (controlContainer.width - 10));
 
-            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("K45_VW_RELOAD_IMPORT_FILES"), ReloadImportFiles), (uint)(controlContainer.width - 10));
+            KlyteMonoUtils.LimitWidth((UIButton) group1.AddButton(Locale.Get("K45_VW_RELOAD_IMPORT_FILES"), ReloadImportFiles), (uint) (controlContainer.width - 10));
             m_ddImport = group1.AddDropdown(Locale.Get("K45_VW_SELECT_FILE_IMPORT"), new string[0], "", (x) => { m_btnImport.isEnabled = (x >= 0); });
             ConfigComponentPanel(m_ddImport);
-            m_btnImport = (UIButton)group1.AddButton(Locale.Get("K45_VW_IMPORT_SELECTED"), Import);
-            VWUtils.LimitWidth(m_btnImport, (uint)(controlContainer.width - 10));
-            VWUtils.LimitWidth((UIButton)group1.AddButton(Locale.Get("K45_VW_EXPORT_CURRENT"), Export), (uint)(controlContainer.width - 10));
+            m_btnImport = (UIButton) group1.AddButton(Locale.Get("K45_VW_IMPORT_SELECTED"), Import);
+            KlyteMonoUtils.LimitWidth(m_btnImport, (uint) (controlContainer.width - 10));
+            KlyteMonoUtils.LimitWidth((UIButton) group1.AddButton(Locale.Get("K45_VW_EXPORT_CURRENT"), Export), (uint) (controlContainer.width - 10));
 
             ReloadImportFiles();
             m_btnImport.isEnabled = (m_ddImport.items.Length > 0);
@@ -65,14 +63,14 @@ namespace Klyte.VehicleWealthizer.UI
         private void ConfigComponentPanel(UIComponent reference)
         {
             reference.GetComponentInParent<UIPanel>().autoFitChildrenVertically = true;
-            VWUtils.createElement(out UIPanel labelContainer, reference.parent.transform);
+            KlyteMonoUtils.CreateElement(out UIPanel labelContainer, reference.parent.transform);
             labelContainer.size = new Vector2(240, reference.height);
             labelContainer.zOrder = 0;
             UILabel lbl = reference.parent.GetComponentInChildren<UILabel>();
             lbl.transform.SetParent(labelContainer.transform);
             lbl.textAlignment = UIHorizontalAlignment.Center;
             lbl.minimumSize = new Vector2(240, reference.height);
-            VWUtils.LimitWidth(lbl, 240);
+            KlyteMonoUtils.LimitWidth(lbl, 240);
             lbl.verticalAlignment = UIVerticalAlignment.Middle;
             lbl.pivot = UIPivotPoint.TopCenter;
             lbl.relativePosition = new Vector3(0, lbl.relativePosition.y);
@@ -82,10 +80,10 @@ namespace Klyte.VehicleWealthizer.UI
         private void ReloadImportFiles()
         {
             m_importFiles = new Dictionary<string, string>();
-            foreach (var filename in Directory.GetFiles(VehicleWealthizerMod.importExportWealthFolder, "*" + EXT_CONF).Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
+            foreach (string filename in Directory.GetFiles(VehicleWealthizerMod.ImportExportWealthFolder, "*" + EXT_CONF).Select(x => x.Split(Path.DirectorySeparatorChar).Last()))
             {
-                var name = filename.Substring(0, filename.Length - EXT_CONF.Length);
-                m_importFiles[name] = VehicleWealthizerMod.importExportWealthFolder + Path.DirectorySeparatorChar + filename;
+                string name = filename.Substring(0, filename.Length - EXT_CONF.Length);
+                m_importFiles[name] = VehicleWealthizerMod.ImportExportWealthFolder + Path.DirectorySeparatorChar + filename;
             }
             m_ddImport.items = m_importFiles.Keys.ToArray();
         }
@@ -101,7 +99,7 @@ namespace Klyte.VehicleWealthizer.UI
         {
             string contents = VWVehicleExtensionUtils.GenerateSerializedFile();
             string filename = $"{SimulationManager.instance.m_metaData.m_CityName} - {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}";
-            File.WriteAllText(VehicleWealthizerMod.importExportWealthFolder + Path.DirectorySeparatorChar + filename + EXT_CONF, contents);
+            File.WriteAllText(VehicleWealthizerMod.ImportExportWealthFolder + Path.DirectorySeparatorChar + filename + EXT_CONF, contents);
             ReloadImportFiles();
             m_ddImport.selectedValue = filename;
             VWVehicleList.instance.Invalidate();

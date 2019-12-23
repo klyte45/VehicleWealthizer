@@ -1,5 +1,3 @@
-﻿v1.1
-	- REMOVED KLYTE COMMONS DEPENDENCY
-	- New 5th Gen mod icon
-	- Campus update (finally!)
-	- Minor UI fixes
+﻿v2
+	- Full converted to Gen 5
+	- Now all information of the models selected are saved inside the savegames

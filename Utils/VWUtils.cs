@@ -1,58 +1,43 @@
-using ColossalFramework;
-using ColossalFramework.Globalization;
-using ColossalFramework.UI;
 using Klyte.Commons.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using Klyte.VehicleWealthizer.Extensors;
+using System.Collections.Generic;
 
 namespace Klyte.VehicleWealthizer.Utils
 {
-    internal class VWUtils : KlyteUtils
+    internal class VWUtils
     {
-        #region Logging
-        public static void doLog(string format, params object[] args)
-        {
-            try
-            {
-                if (VehicleWealthizerMod.debugMode)
-                {
-                    Debug.LogWarningFormat("VWv" + VehicleWealthizerMod.version + " " + format, args);
-                }
-            }
-            catch
-            {
-                Debug.LogErrorFormat("VWv" + VehicleWealthizerMod.version + " Erro ao fazer log: {0} (args = {1})", format, args == null ? "[]" : string.Join(",", args.Select(x => x != null ? x.ToString() : "--NULL--").ToArray()));
-            }
-        }
-        public static void doErrorLog(string format, params object[] args)
-        {
-            try
-            {
-                Debug.LogWarningFormat("VWv" + VehicleWealthizerMod.version + " " + format, args);
-            }
-            catch
-            {
-                Debug.LogErrorFormat("VWv" + VehicleWealthizerMod.version + " Erro ao logar ERRO!!!: {0} (args = [{1}])", format, args == null ? "" : string.Join(",", args.Select(x => x != null ? x.ToString() : "--NULL--").ToArray()));
-            }
-
-        }
-        #endregion
 
         internal static List<string> LoadBasicAssets(CitizenWealthDefinition definition)
         {
-            List<string> basicAssetsList = new List<string>();
-            for (uint num = 0u; (ulong)num < (ulong)((long)PrefabCollection<VehicleInfo>.PrefabCount()); num += 1u)
+            var basicAssetsList = new List<string>();
+            for (uint num = 0u; num < (ulong) PrefabCollection<VehicleInfo>.PrefabCount(); num += 1u)
             {
                 VehicleInfo prefab = PrefabCollection<VehicleInfo>.GetPrefab(num);
-                if (!(prefab == null) && definition.isFromSystem(prefab) && !IsTrailer(prefab))
+                if (!(prefab == null) && definition.isFromSystem(prefab) && !VehicleUtils.IsTrailer(prefab))
                 {
                     basicAssetsList.Add(prefab.name);
                 }
             }
             return basicAssetsList;
+        }
+        internal static VWConfigIndex GetConfigServiceSystemForDefinition(ref CitizenWealthDefinition serviceSystemDefinition)
+        {
+            if (serviceSystemDefinition == CitizenWealthDefinition.LOW)
+            {
+                return VWConfigIndex.WEALTH_LOW;
+            }
+
+            if (serviceSystemDefinition == CitizenWealthDefinition.MEDIUM)
+            {
+                return VWConfigIndex.WEALTH_MED;
+            }
+
+            if (serviceSystemDefinition == CitizenWealthDefinition.HIGH)
+            {
+                return VWConfigIndex.WEALTH_HGH;
+            }
+
+            return VWConfigIndex.NIL;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using ColossalFramework;
-using Klyte.VehicleWealthizer.Overrides;
 using Klyte.VehicleWealthizer.Utils;
 using System;
 using System.Collections.Generic;
@@ -23,57 +22,34 @@ namespace Klyte.VehicleWealthizer.Extensors
             get {
                 if (m_availableDefinitions.Count == 0)
                 {
-                    m_availableDefinitions[LOW] = VWVehiclesWealthExtensionLow.instance;
-                    m_availableDefinitions[MEDIUM] = VWVehiclesWealthExtensionMed.instance;
-                    m_availableDefinitions[HIGH] = VWVehiclesWealthExtensionHgh.instance;
+                    m_availableDefinitions[LOW] = VWVehiclesWealthExtensionLow.Instance;
+                    m_availableDefinitions[MEDIUM] = VWVehiclesWealthExtensionMed.Instance;
+                    m_availableDefinitions[HIGH] = VWVehiclesWealthExtensionHgh.Instance;
                 }
                 return m_availableDefinitions;
             }
         }
         public static readonly Dictionary<CitizenWealthDefinition, IVWVehiclesWealthExtension> m_availableDefinitions = new Dictionary<CitizenWealthDefinition, IVWVehiclesWealthExtension>();
-        public static Dictionary<CitizenWealthDefinition, Type> sysDefinitions
+        public static Dictionary<CitizenWealthDefinition, Type> sysDefinitions { get; } = new Dictionary<CitizenWealthDefinition, Type>()
         {
-            get {
-                if (m_sysDefinitions.Count == 0)
-                {
-                    m_sysDefinitions[HIGH] = typeof(VWWthDefHgh);
-                    m_sysDefinitions[MEDIUM] = typeof(VWWthDefMed);
-                    m_sysDefinitions[LOW] = typeof(VWWthDefLow);
-                }
-                return m_sysDefinitions;
-            }
-        }
-        private static readonly Dictionary<CitizenWealthDefinition, Type> m_sysDefinitions = new Dictionary<CitizenWealthDefinition, Type>();
-
+            [HIGH] = typeof(VWWthDefHgh),
+            [MEDIUM] = typeof(VWWthDefMed),
+            [LOW] = typeof(VWWthDefLow)
+        };
         public Citizen.Wealth wealth
         {
             get;
         }
 
-        private CitizenWealthDefinition(Citizen.Wealth wealth)
-        {
-            this.wealth = wealth;
-        }
+        private CitizenWealthDefinition(Citizen.Wealth wealth) => this.wealth = wealth;
 
-        internal IVWVehiclesWealthExtension GetVehicleExtension()
-        {
-            return availableDefinitions[this];
-        }
+        internal IVWVehiclesWealthExtension GetVehicleExtension() => availableDefinitions[this];
 
-        internal Type GetDefType()
-        {
-            return sysDefinitions[this];
-        }
+        internal Type GetDefType() => sysDefinitions[this];
 
-        public bool isFromSystem(Citizen citizen)
-        {
-            return citizen.WealthLevel == wealth;
-        }
+        public bool isFromSystem(Citizen citizen) => citizen.WealthLevel == wealth;
 
-        public bool isFromSystem(VehicleInfo info)
-        {
-            return info.GetService() == ItemClass.Service.Residential && allowedSubservices.Contains(info.GetSubService());
-        }
+        public bool isFromSystem(VehicleInfo info) => info.GetService() == ItemClass.Service.Residential && allowedSubservices.Contains(info.GetSubService());
 
         public override bool Equals(object obj)
         {
@@ -85,7 +61,7 @@ namespace Klyte.VehicleWealthizer.Extensors
             {
                 return false;
             }
-            CitizenWealthDefinition other = (CitizenWealthDefinition)obj;
+            var other = (CitizenWealthDefinition) obj;
 
             return wealth == other.wealth;
         }
@@ -98,46 +74,34 @@ namespace Klyte.VehicleWealthizer.Extensors
             }
             return a.Equals(b);
         }
-        public static bool operator !=(CitizenWealthDefinition a, CitizenWealthDefinition b)
-        {
-            return !(a == b);
-        }
+        public static bool operator !=(CitizenWealthDefinition a, CitizenWealthDefinition b) => !(a == b);
 
-        public static CitizenWealthDefinition from(Wealth wealth)
-        {
-            return availableDefinitions.Keys.FirstOrDefault(x => x.wealth == wealth);
-        }
+        public static CitizenWealthDefinition from(Wealth wealth) => availableDefinitions.Keys.FirstOrDefault(x => x.wealth == wealth);
 
 
-        public VWConfigWarehouse.ConfigIndex toConfigIndex()
+        public VWConfigIndex toConfigIndex()
         {
-            var th = this;
-            return VWConfigWarehouse.getConfigServiceSystemForDefinition(ref th);
+            CitizenWealthDefinition th = this;
+            return VWUtils.GetConfigServiceSystemForDefinition(ref th);
         }
 
-        public override string ToString()
-        {
-            return wealth.ToString();
-        }
+        public override string ToString() => wealth.ToString();
 
         public override int GetHashCode()
         {
-            var hashCode = 286451371;
-            hashCode = hashCode * -1521134295 + wealth.GetHashCode();
+            int hashCode = 286451371;
+            hashCode = (hashCode * -1521134295) + wealth.GetHashCode();
             return hashCode;
         }
     }
 
-    internal abstract class VWWthDef<T> : Singleton<T> where T : VWWthDef<T>
+    public abstract class VWWthDef<T> : Singleton<T> where T : VWWthDef<T>
     {
         internal abstract CitizenWealthDefinition GetCWD();
-        public void Awake()
-        {
-            this.transform.SetParent(VehicleWealthizerMod.instance.refTransform);
-        }
+        public void Awake() => transform.SetParent(VehicleWealthizerMod.Instance.RefTransform);
     }
-    internal sealed class VWWthDefLow : VWWthDef<VWWthDefLow> { internal override CitizenWealthDefinition GetCWD() { return CitizenWealthDefinition.LOW; } }
-    internal sealed class VWWthDefMed : VWWthDef<VWWthDefMed> { internal override CitizenWealthDefinition GetCWD() { return CitizenWealthDefinition.MEDIUM; } }
-    internal sealed class VWWthDefHgh : VWWthDef<VWWthDefHgh> { internal override CitizenWealthDefinition GetCWD() { return CitizenWealthDefinition.HIGH; } }
+    public sealed class VWWthDefLow : VWWthDef<VWWthDefLow> { internal override CitizenWealthDefinition GetCWD() => CitizenWealthDefinition.LOW; }
+    public sealed class VWWthDefMed : VWWthDef<VWWthDefMed> { internal override CitizenWealthDefinition GetCWD() => CitizenWealthDefinition.MEDIUM; }
+    public sealed class VWWthDefHgh : VWWthDef<VWWthDefHgh> { internal override CitizenWealthDefinition GetCWD() => CitizenWealthDefinition.HIGH; }
 
 }
