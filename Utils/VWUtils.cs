@@ -20,25 +20,7 @@ namespace Klyte.VehicleWealthizer.Utils
             }
             return basicAssetsList;
         }
-        internal static VWConfigIndex GetConfigServiceSystemForDefinition(ref CitizenWealthDefinition serviceSystemDefinition)
-        {
-            if (serviceSystemDefinition == CitizenWealthDefinition.LOW)
-            {
-                return VWConfigIndex.WEALTH_LOW;
-            }
-
-            if (serviceSystemDefinition == CitizenWealthDefinition.MEDIUM)
-            {
-                return VWConfigIndex.WEALTH_MED;
-            }
-
-            if (serviceSystemDefinition == CitizenWealthDefinition.HIGH)
-            {
-                return VWConfigIndex.WEALTH_HGH;
-            }
-
-            return VWConfigIndex.NIL;
-        }
+       
     }
 }
 

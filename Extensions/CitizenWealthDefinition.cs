@@ -78,13 +78,7 @@ namespace Klyte.VehicleWealthizer.Extensors
 
         public static CitizenWealthDefinition from(Wealth wealth) => availableDefinitions.Keys.FirstOrDefault(x => x.wealth == wealth);
 
-
-        public VWConfigIndex toConfigIndex()
-        {
-            CitizenWealthDefinition th = this;
-            return VWUtils.GetConfigServiceSystemForDefinition(ref th);
-        }
-
+        
         public override string ToString() => wealth.ToString();
 
         public override int GetHashCode()

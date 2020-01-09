@@ -1,17 +1,14 @@
 ﻿using ColossalFramework;
-using ICities;
 using Klyte.Commons.Utils;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Xml.Serialization;
 
 namespace Klyte.Commons.Interfaces
 {
     [XmlRoot("ConfigWarehouse")]
-    public abstract class ConfigWarehouseBase<T, I> : Singleton<I> where T : Enum, IConvertible where I : ConfigWarehouseBase<T, I>, new()
+    public abstract class ConfigWarehouseBase<T, I> : SingletonLite<I> where T : Enum, IConvertible where I : ConfigWarehouseBase<T, I>, new()
     {
 
         protected const string LIST_SEPARATOR = "∂";
@@ -19,7 +16,6 @@ namespace Klyte.Commons.Interfaces
         protected const int TYPE_STRING = 0x100;
         protected const int TYPE_INT = 0x200;
         protected const int TYPE_BOOL = 0x300;
-        protected const int TYPE_LIST = 0x400;
         protected const int TYPE_PART = 0xF00;
         protected const int TYPE_DICTIONARY = 0x500;
 
@@ -28,13 +24,16 @@ namespace Klyte.Commons.Interfaces
         protected string cityId;
         protected string cityName;
 
+        protected bool IsDefaultFile => cityId == GLOBAL_CONFIG_INDEX;
+
         public static bool IsCityLoaded => Singleton<SimulationManager>.instance.m_metaData != null;
         protected string CurrentCityId => IsCityLoaded ? Singleton<SimulationManager>.instance.m_metaData.m_gameInstanceIdentifier : GLOBAL_CONFIG_INDEX;
         protected string CurrentCityName => IsCityLoaded ? Singleton<SimulationManager>.instance.m_metaData.m_CityName : GLOBAL_CONFIG_INDEX;
 
         protected string ThisFileName => $"{GetType().Name}_{(cityId ?? GLOBAL_CONFIG_INDEX)}.xml";
         protected string DefaultFileName => $"{GetType().Name}_{(GLOBAL_CONFIG_INDEX)}.xml";
-        public string ThisPathName => CommonProperties.ModRootFolder + ThisFileName;
+        public string ThisPath => $"{CommonProperties.ModRootFolder }{Path.DirectorySeparatorChar}{ ThisFileName}";
+        public string DefaultPath => $"{CommonProperties.ModRootFolder }{Path.DirectorySeparatorChar}{ DefaultFileName}";
 
 
         public static bool GetCurrentConfigBool(T i) => instance.CurrentLoadedCityConfig.GetBool(i);
@@ -43,9 +42,6 @@ namespace Klyte.Commons.Interfaces
         public static void SetCurrentConfigInt(T i, int? value) => instance.CurrentLoadedCityConfig.SetInt(i, value);
         public static string GetCurrentConfigString(T i) => instance.CurrentLoadedCityConfig.GetString(i);
         public static void SetCurrentConfigString(T i, string value) => instance.CurrentLoadedCityConfig.SetString(i, value);
-        public static List<int> GetCurrentConfigListInt(T i) => instance.CurrentLoadedCityConfig.GetListInt(i);
-        public static void AddToCurrentConfigListInt(T i, int value) => instance.CurrentLoadedCityConfig.AddToListInt(i, value);
-        public static void RemoveFromCurrentConfigListInt(T i, int value) => instance.CurrentLoadedCityConfig.RemoveFromListInt(i, value);
 
         public I CurrentLoadedCityConfig => GetConfig(CurrentCityId, CurrentCityName);
 
@@ -86,18 +82,17 @@ namespace Klyte.Commons.Interfaces
                 try
                 {
                     I defaultFile = GetConfig(GLOBAL_CONFIG_INDEX, GLOBAL_CONFIG_INDEX);
-                    foreach (string key in GameSettings.FindSettingsFileByName(defaultFile.ThisFileName).ListKeys())
+                    foreach (int value in Enum.GetValues(typeof(T)))
                     {
                         try
                         {
-                            var ci = (T) Enum.Parse(typeof(T), key);
-                            switch (ci.ToInt32(CultureInfo.CurrentCulture.NumberFormat) & TYPE_PART)
+                            var ci = (T) Enum.ToObject(typeof(T), value);
+                            switch (value & TYPE_PART)
                             {
                                 case TYPE_BOOL:
                                     result.SetBool(ci, defaultFile.GetBool(ci));
                                     break;
                                 case TYPE_STRING:
-                                case TYPE_LIST:
                                     result.SetString(ci, defaultFile.GetString(ci));
                                     break;
                                 case TYPE_INT:
@@ -107,7 +102,7 @@ namespace Klyte.Commons.Interfaces
                         }
                         catch (Exception e)
                         {
-                            LogUtils.DoErrorLog($"Erro copiando propriedade \"{key}\" para o novo arquivo da classe {typeof(I)}: {e.Message}");
+                            LogUtils.DoErrorLog($"Erro copiando propriedade \"{value}\" para o novo arquivo da classe {typeof(I)}: {e.Message}");
                         }
                     }
                 }
@@ -118,50 +113,76 @@ namespace Klyte.Commons.Interfaces
             }
             else
             {
-                if (File.Exists(result.ThisFileName))
+                if (File.Exists(result.ThisPath))
                 {
-                    result = Deserialize(File.ReadAllText(result.ThisFileName));
+                    string text = File.ReadAllText(result.ThisPath);
+                    try
+                    {
+                        result = Deserialize(text);
+                        if (result == null)
+                        {
+                            result = new I
+                            {
+                                cityId = cityId,
+                                cityName = cityName
+                            };
+                            result.FallBackDefaultFile();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        LogUtils.DoLog($"{typeof(I)} CORRUPTED DATA! => Data:\n{text}\nException: {e.Message}\n{e.StackTrace}");
+                        result = new I
+                        {
+                            cityId = cityId,
+                            cityName = cityName
+                        };
+                        result.FallBackDefaultFile();
+                    }
                 }
+                else
+                {
+                    result?.FallBackDefaultFile();
+                }
+                result.EventOnPropertyChanged += (a, b, c, d) => result.SaveAsDefault();
             }
             return result;
         }
 
-        public void SaveAsDefault() => File.WriteAllText(DefaultFileName, Serialize((I) this));
-
+        protected virtual void FallBackDefaultFile() { }
+        public void SaveAsDefault()
+        {
+            File.WriteAllText(DefaultPath, Serialize((I) this));
+            LogUtils.DoErrorLog($"Saved global at {DefaultPath}");
+        }
+        public void LoadFromDefault()
+        {
+            if (File.Exists(DefaultPath))
+            {
+                loadedCities[cityId ?? GLOBAL_CONFIG_INDEX] = Deserialize(File.ReadAllText(DefaultPath));
+                LogUtils.DoErrorLog($"Loaded {cityId} from {DefaultPath}");
+            }
+        }
+        public string Export()
+        {
+            File.WriteAllText(ThisPath, Serialize((I) this));
+            LogUtils.DoErrorLog($"Saved Export at {ThisPath}");
+            return ThisPath;
+        }
+        public void ReloadFromDisk()
+        {
+            if (File.Exists(ThisPath))
+            {
+                loadedCities[cityId ?? GLOBAL_CONFIG_INDEX] = Deserialize(File.ReadAllText(ThisPath));
+                LogUtils.DoErrorLog($"Saved {cityId} from {ThisPath}");
+            }
+        }
         public string GetString(T i) => GetFromFileString(i) ?? GetDefaultStringValueForProperty(i);
         public bool GetBool(T i) => GetFromFileBool(i) ?? GetDefaultBoolValueForProperty(i);
         public int GetInt(T i) => GetFromFileInt(i) ?? GetDefaultIntValueForProperty(i);
         public void SetString(T i, string value) => SetToFile(i, value);
         public void SetBool(T idx, bool? newVal) => SetToFile(idx, newVal);
         public void SetInt(T idx, int? value) => SetToFile(idx, value);
-
-        #region List Edition
-        public List<int> GetListInt(T i)
-        {
-            string listString = GetFromFileString(i);
-            var result = new List<int>();
-            foreach (string s in listString.Split(LIST_SEPARATOR.ToCharArray()))
-            {
-                result.Add(Int32Extensions.ParseOrDefault(s, 0));
-            }
-            return result;
-        }
-        public void AddToListInt(T i, int value)
-        {
-            List<int> list = GetListInt(i);
-            if (!list.Contains(value))
-            {
-                list.Add(value);
-                SetToFile(i, SerializeList(list));
-            }
-        }
-        public void RemoveFromListInt(T i, int value)
-        {
-            List<int> list = GetListInt(i);
-            list.Remove(value);
-            SetToFile(i, SerializeList(list));
-        }
-        #endregion
 
         [XmlElement("StringData")]
         public SimpleEnumerableList<T, string> m_cachedStringSaved = new SimpleEnumerableList<T, string>();
@@ -170,7 +191,6 @@ namespace Klyte.Commons.Interfaces
         [XmlElement("BoolData")]
         public SimpleEnumerableList<T, bool?> m_cachedBoolSaved = new SimpleEnumerableList<T, bool?>();
 
-        protected string SerializeList<K>(List<K> l) => string.Join(LIST_SEPARATOR, l.Select(x => x.ToString()).ToArray());
 
         private string GetSavedString(T i)
         {
@@ -225,12 +245,13 @@ namespace Klyte.Commons.Interfaces
         public virtual string GetDefaultStringValueForProperty(T i) => string.Empty;
 
         #region Serialization
-        private static I Deserialize(string data) => XmlUtils.DefaultXmlDeserialize<I>(data);
-        private static string Serialize(I data) => XmlUtils.DefaultXmlSerialize(data);
+        private static I Deserialize(string data) => XmlUtils.DefaultXmlDeserialize<I>(data) ?? new I();
+
+        private static string Serialize(I data) => XmlUtils.DefaultXmlSerialize(data, false);
         public void OnReleased() { }
         #endregion
 
-        public static event OnWarehouseConfigChanged EventOnPropertyChanged;
+        public event OnWarehouseConfigChanged EventOnPropertyChanged;
 
 
         public delegate void OnWarehouseConfigChanged(T idx, bool? newValueBool, int? newValueInt, string newValueString);

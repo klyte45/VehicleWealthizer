@@ -126,15 +126,17 @@
     <Compile Include="commons\Extensors\UI\UITabstripAutoResize.cs" />
     <Compile Include="commons\Interfaces\BasicIUserMod.cs" />
     <Compile Include="commons\Interfaces\BasicIUserModSimplified.cs" />
+    <Compile Include="commons\Interfaces\IEnumerableIndex.cs" />
     <Compile Include="commons\Interfaces\IFontConfigContainer.cs" />
     <Compile Include="commons\Interfaces\IIdentifiable.cs" />
-    <Compile Include="commons\Interfaces\IEnumerableIndex.cs" />
     <Compile Include="commons\Interfaces\ILibable.cs" />
     <Compile Include="commons\Interfaces\IPropColorContainer.cs" />
     <Compile Include="commons\Interfaces\ITimeable.cs" />
     <Compile Include="commons\Interfaces\Warehouse\BasicSingletonSerializableDataExtension.cs" />
     <Compile Include="commons\Interfaces\Warehouse\ConfigWarehouseBase.cs" />
-    <Compile Include="commons\Interfaces\Warehouse\ExtensionInterfaceDictionaryImpl.cs" />
+    <Compile Include="commons\Interfaces\Warehouse\ExtensionInterface2LevelIntImpl.cs" />
+    <Compile Include="commons\Interfaces\Warehouse\ExtensionInterfaceDictionaryByEnumImpl.cs" />
+    <Compile Include="commons\Interfaces\Warehouse\ExtensionInterfaceDictionaryByUintImpl.cs" />
     <Compile Include="commons\Interfaces\Warehouse\ExtensionInterfaceListImpl .cs" />
     <Compile Include="commons\Interfaces\Warehouse\ExtensionInterfaceSingleImpl.cs" />
     <Compile Include="commons\Interfaces\Warehouse\ExtensorContainer.cs" />
@@ -172,18 +174,22 @@
     <Compile Include="commons\Utils\StructExtensions\PathUnitExtensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\Vector2Extensions.cs" />
     <Compile Include="commons\Utils\StructExtensions\Vector3Extensions.cs" />
+    <Compile Include="commons\Utils\TabCommons.cs" />
     <Compile Include="commons\Utils\TextureAtlasUtils.cs" />
     <Compile Include="commons\Utils\TextureRenderUtils.cs" />
     <Compile Include="commons\Utils\TextureScaler.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\CardinalPoint .cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\ColorList.cs" />
-    <Compile Include="commons\Utils\UtilitiesClasses\SimpleEnumerableList.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\LibableList.cs" />
-    <Compile Include="commons\Utils\UtilitiesClasses\SimpleXmlList.cs" />
-    <Compile Include="commons\Utils\UtilitiesClasses\SimpleNonSequentialList.cs" />
+    <Compile Include="commons\Utils\UtilitiesClasses\MutableTuple.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\NonSequentialList.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\NumberArrays.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\Range.cs" />
+    <Compile Include="commons\Utils\UtilitiesClasses\SimpleEnumerableList.cs" />
+    <Compile Include="commons\Utils\UtilitiesClasses\SimpleNonSequentialList.cs" />
+    <Compile Include="commons\Utils\UtilitiesClasses\SimpleXmlDictionary.cs" />
+    <Compile Include="commons\Utils\UtilitiesClasses\SimpleXmlHashSet.cs" />
+    <Compile Include="commons\Utils\UtilitiesClasses\SimpleXmlList.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\TimeableList.cs" />
     <Compile Include="commons\Utils\UtilitiesClasses\Tuple.cs" />
     <Compile Include="commons\Utils\VehicleUtils.cs" />
@@ -195,16 +201,14 @@
     <Compile Include="Listing\VWVehicleList.cs" />
     <Compile Include="UI\VWConfigFilesPanel.cs" />
     <Compile Include="UI\VWPanel.cs" />
-    <Compile Include="VWConfigIndex.cs" />
     <Compile Include="Utils\VWUtils.cs" />
     <Compile Include="VehicleWealthizer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UI\VersionNotes.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="UI\Images\spritesCommon.png" />
-    <EmbeddedResource Include="UI\Images\sprites.png" />
+    <EmbeddedResource Include="commons\UI\i18n\en.properties" />
+    <EmbeddedResource Include="commons\UI\i18n\fr.properties" />
+    <EmbeddedResource Include="commons\UI\i18n\pt.properties" />
+    <EmbeddedResource Include="commons\UI\i18n\ru.properties" />
     <EmbeddedResource Include="commons\UI\Images\%25K45_24hLineIcon.png" />
     <EmbeddedResource Include="commons\UI\Images\%25K45_AutoColorIcon.png" />
     <EmbeddedResource Include="commons\UI\Images\%25K45_AutoNameIcon.png" />
@@ -250,8 +254,19 @@
     <EmbeddedResource Include="commons\UI\Images\%25K45_TrapezeIcon.png" />
     <EmbeddedResource Include="commons\UI\Images\%25K45_TriangleIcon.png" />
     <EmbeddedResource Include="commons\UI\Images\bordersDescriptor.txt" />
+    <EmbeddedResource Include="UI\VersionNotes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UI\Images\spritesCommon.png" />
+    <EmbeddedResource Include="UI\Images\sprites.png" />
     <EmbeddedResource Include="UI\Images\%25K45_VW_Icon.png" />
     <EmbeddedResource Include="UI\Images\%25K45_VW_RemoveUnwantedIcon.png" />
+    <Content Include="commons\UI\Images\%25K45_AbsoluteMode.png" />
+    <Content Include="commons\UI\Images\%25K45_MenuPanel_color.png" />
+    <Content Include="commons\UI\Images\%25K45_RelativeMode.png" />
+    <Content Include="commons\UI\Images\%25K45_RemoveUnwantedIcon.png" />
+    <Content Include="commons\UI\Images\lineFormat.png" />
+    <Content Include="commons\UI\Images\lineFormat.psd" />
     <Content Include="UI\Images\sprites.psd" />
   </ItemGroup>
   <ItemGroup>
@@ -292,10 +307,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="commons\README.md" />
-    <EmbeddedResource Include="commons\UI\i18n\en.properties" />
-    <EmbeddedResource Include="commons\UI\i18n\fr.properties" />
-    <EmbeddedResource Include="commons\UI\i18n\pt.properties" />
-    <EmbeddedResource Include="commons\UI\i18n\ru.properties" />
     <None Include="commons\UI\Images\lineFormats.psd" />
     <None Include="commons\UI\Images\sprites.psd" />
     <None Include="packages.config" />

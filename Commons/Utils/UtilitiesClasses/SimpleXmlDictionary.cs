@@ -1,15 +1,13 @@
-﻿
-using Klyte.Commons.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using System.Xml.Serialization;
 
 
 namespace Klyte.Commons.Utils
 {
-    [XmlRoot("SimpleNonSequentialList")]
+    [XmlRoot("SimpleXmlDictionary")]
 
-    public class SimpleNonSequentialList<TValue> : Dictionary<long, TValue>, IXmlSerializable
+    public class SimpleXmlDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable where TKey : class where TValue : class
     {
         #region IXmlSerializable Members
 
@@ -25,7 +23,7 @@ namespace Klyte.Commons.Utils
                 reader.Read();
                 return;
             }
-            var valueSerializer = new XmlSerializer(typeof(ValueContainer<TValue>), "");
+            var valueSerializer = new XmlSerializer(typeof(EntryStructValueContainer<TKey, TValue>), "");
             reader.ReadStartElement();
             while (reader.NodeType != System.Xml.XmlNodeType.EndElement)
             {
@@ -35,12 +33,12 @@ namespace Klyte.Commons.Utils
                     continue;
                 }
 
-                var value = (ValueContainer<TValue>) valueSerializer.Deserialize(reader);
+                var value = (EntryStructValueContainer<TKey, TValue>) valueSerializer.Deserialize(reader);
                 if (value.Id == null)
                 {
                     continue;
                 }
-                Add(value.Id.Value, value.Value);
+                Add(value.Id, value.Value ?? null);
 
             }
 
@@ -55,14 +53,14 @@ namespace Klyte.Commons.Utils
 
         {
 
-            var valueSerializer = new XmlSerializer(typeof(ValueContainer<TValue>), "");
+            var valueSerializer = new XmlSerializer(typeof(EntryStructValueContainer<TKey, TValue>), "");
 
             var ns = new XmlSerializerNamespaces();
             ns.Add("", "");
-            foreach (long key in Keys)
+            foreach (TKey key in Keys)
             {
                 TValue value = this[key];
-                valueSerializer.Serialize(writer, new ValueContainer<TValue>()
+                valueSerializer.Serialize(writer, new EntryStructValueContainer<TKey, TValue>()
                 {
                     Id = key,
                     Value = value
@@ -76,11 +74,11 @@ namespace Klyte.Commons.Utils
         #endregion
 
     }
-    [XmlRoot("ValueContainer")]
-    public class ValueContainer<TValue> : IIdentifiable
+    [XmlRoot("Entry")]
+    public class EntryStructValueContainer<TKey, TValue> where TKey : class where TValue : class
     {
-        [XmlAttribute("id")]
-        public long? Id { get; set; }
+        [XmlAttribute("key")]
+        public TKey Id { get; set; }
 
         [XmlElement]
         public TValue Value { get; set; }

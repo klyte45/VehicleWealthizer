@@ -57,6 +57,7 @@ namespace Klyte.Commons.Interfaces
                 LogUtils.DoLog($"{SimpleName} Redirectors: {instances.Count()}");
                 foreach (Type t in instances)
                 {
+                    LogUtils.DoLog($"Redirector: {t}");
                     m_topObj.AddComponent(t);
                 }
                 if (typeof(C) != typeof(MonoBehaviour))
@@ -203,20 +204,6 @@ namespace Klyte.Commons.Interfaces
                 CreateGroup9(helper);
             }
 
-            if (m_showLangDropDown)
-            {
-                UIDropDown dd = null;
-                dd = helper.AddDropdownLocalized("K45_MOD_LANG", (new string[] { "K45_GAME_DEFAULT_LANGUAGE" }.Concat(KlyteLocaleManager.locales.Select(x => $"K45_LANG_{x}")).Select(x => Locale.Get(x))).ToArray(), KlyteLocaleManager.GetLoadedLanguage(), delegate (int idx)
-                {
-                    KlyteLocaleManager.SaveLoadedLanguage(idx);
-                    KlyteLocaleManager.ReloadLanguage();
-                    KlyteLocaleManager.RedrawUIComponents();
-                });
-            }
-            else
-            {
-                helper.AddLabel(string.Format(Locale.Get("K45_LANG_CTRL_MOD_INFO"), Locale.Get("K45_MOD_CONTROLLING_LOCALE")));
-            }
 
             LogUtils.DoLog("End Loading Options");
         }
@@ -235,6 +222,22 @@ namespace Klyte.Commons.Interfaces
             {
                 ShowVersionInfoPopup(true);
             });
+
+            if (m_showLangDropDown)
+            {
+                UIDropDown dd = null;
+                dd = group9.AddDropdownLocalized("K45_MOD_LANG", (new string[] { "K45_GAME_DEFAULT_LANGUAGE" }.Concat(KlyteLocaleManager.locales.Select(x => $"K45_LANG_{x}")).Select(x => Locale.Get(x))).ToArray(), KlyteLocaleManager.GetLoadedLanguage(), delegate (int idx)
+                {
+                    KlyteLocaleManager.SaveLoadedLanguage(idx);
+                    KlyteLocaleManager.ReloadLanguage();
+                    KlyteLocaleManager.RedrawUIComponents();
+                });
+            }
+            else
+            {
+                group9.AddLabel(string.Format(Locale.Get("K45_LANG_CTRL_MOD_INFO"), Locale.Get("K45_MOD_CONTROLLING_LOCALE")));
+            }
+
         }
 
         public virtual void Group9SettingsUI(UIHelperExtension group9) { }

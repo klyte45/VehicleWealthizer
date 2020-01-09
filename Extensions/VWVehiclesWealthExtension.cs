@@ -10,76 +10,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Klyte.VehicleWealthizer.Extensors
 {
     public interface IVWVehiclesWealthExtension : IVWAssetSelectorExtension
     {
-        string[] Serialize();
-        void Deserialize(string[] lines);
+        string[] SerializeToString();
+        void DeserializeFromString(string[] lines);
     }
 
-    public abstract class VWVehiclesWealthExtension<W, SG> : ExtensionInterfaceSingleImpl<VWConfigIndex, ExtConfigs, SimpleXmlList<string>, SG>, IVWVehiclesWealthExtension where W : VWWthDef<W>, new() where SG : VWVehiclesWealthExtension<W, SG>, new()
+    public abstract class VWVehiclesWealthExtension<W, SG> : DataExtensorBase<SG>, IVWVehiclesWealthExtension where W : VWWthDef<W>, new() where SG : VWVehiclesWealthExtension<W, SG>, new()
     {
         private const uint DISTRICT_FLAG = 0x100000;
         private const uint BUILDING_FLAG = 0x200000;
         private const uint ID_PART = 0x0FFFFF;
         private const uint TYPE_PART = 0xF00000;
 
-        public override VWConfigIndex ConfigIndexKey
-        {
-            get {
-                CitizenWealthDefinition def = Definition;
-                return VWUtils.GetConfigServiceSystemForDefinition(ref def);
-            }
-        }
 
         private List<string> m_basicAssetsList;
+        [XmlElement("AssetList")]
+        public SimpleXmlHashSet<string> AssetList { get; set; } = new SimpleXmlHashSet<string>();
 
         private CitizenWealthDefinition Definition { get; } = Singleton<W>.instance.GetCWD();
 
         #region Asset List
-        public List<string> GetAssetList() => SafeGet(ExtConfigs.MODELS);
+        public IEnumerable<string> GetAssetList() => AssetList;
+
         public void AddAsset(string assetId)
         {
-            List<string> temp = GetAssetList();
-            if (temp.Contains(assetId))
-            {
-                return;
-            }
-
             if (m_basicAssetsList == null)
             {
                 LoadBasicAssets();
             }
 
-            temp.Add(assetId);
-            SafeSet(ExtConfigs.MODELS, new SimpleXmlList<string>(temp.Intersect(m_basicAssetsList)));
+            AssetList.Add(assetId);
         }
+
+
         public void RemoveAsset(string assetId)
         {
-            List<string> temp = GetAssetList();
-            if (!temp.Contains(assetId))
-            {
-                return;
-            }
-
             if (m_basicAssetsList == null)
             {
                 LoadBasicAssets();
             }
 
-            temp.RemoveAll(x => x == assetId);
-            SafeSet(ExtConfigs.MODELS, new SimpleXmlList<string>(temp.Intersect(m_basicAssetsList)));
+            AssetList.RemoveWhere(x => x == assetId);
         }
-        public void UseDefaultAssets() => SafeCleanProperty(ExtConfigs.MODELS);
+        public void UseDefaultAssets() => AssetList.Clear();
 
         public VehicleInfo GetAModel()
         {
             LogUtils.DoLog("[{0}] GetAModel", typeof(W).Name);
-            List<string> assetList = GetEffectiveAssetList();
+            IEnumerable<string> assetList = GetEffectiveAssetList();
             VehicleInfo info = null;
-            while (info == null && assetList.Count > 0)
+            while (info == null && assetList.Count() > 0)
             {
                 info = VehicleUtils.GetRandomModel(assetList, out string modelName);
                 if (info == null)
@@ -91,20 +76,19 @@ namespace Klyte.VehicleWealthizer.Extensors
             return info;
         }
 
-        private List<string> GetEffectiveAssetList()
+        private IEnumerable<string> GetEffectiveAssetList()
         {
-            List<string> assetList = GetAssetList();
 
-            if ((assetList?.Count ?? 0) == 0)
+            if ((AssetList?.Count ?? 0) == 0)
             {
                 if (m_basicAssetsList == null)
                 {
                     LoadBasicAssets();
                 }
 
-                assetList = m_basicAssetsList;
+                return m_basicAssetsList;
             }
-            return assetList;
+            return AssetList;
         }
 
         public bool IsModelCompatible(VehicleInfo vehicleInfo) => IsModelCompatible(vehicleInfo.name);
@@ -122,24 +106,28 @@ namespace Klyte.VehicleWealthizer.Extensors
             return m_basicAssetsList.ToDictionary(x => x, x => Locale.Get("VEHICLE_TITLE", x));
         }
 
-        private void LoadBasicAssets() => m_basicAssetsList = VWUtils.LoadBasicAssets(Definition);
+        private void LoadBasicAssets()
+        {
+            m_basicAssetsList = VWUtils.LoadBasicAssets(Definition);
+            AssetList.IntersectWith(m_basicAssetsList);
+        }
 
         #endregion
 
 
         #region Serialization
-        public abstract string serializePrefix { get; }
+        public abstract string SerializePrefix { get; }
 
-        public string[] Serialize() => GetAssetList().Select(x => $"{serializePrefix} {x}").ToArray();
+        public string[] SerializeToString() => GetAssetList().Select(x => $"{SerializePrefix} {x}").ToArray();
 
-        public void Deserialize(string[] lines)
+        public void DeserializeFromString(string[] lines)
         {
             var selectedModels = new List<string>();
             foreach (string line in lines)
             {
-                if (line.StartsWith($"{serializePrefix} "))
+                if (line.StartsWith($"{SerializePrefix} "))
                 {
-                    selectedModels.Add(line.Replace($"{serializePrefix} ", ""));
+                    selectedModels.Add(line.Replace($"{SerializePrefix} ", ""));
                 }
             }
             if (m_basicAssetsList == null)
@@ -151,42 +139,37 @@ namespace Klyte.VehicleWealthizer.Extensors
             LogUtils.DoLog($"IMPORTED: {resultList.Count} assets for {typeof(W)} => {resultList}");
             if (resultList.Count == 0)
             {
-                SafeCleanProperty(ExtConfigs.MODELS);
+                AssetList.Clear();
             }
             else
             {
-                SafeSet(ExtConfigs.MODELS, new SimpleXmlList<string>(resultList));
+                AssetList = new SimpleXmlHashSet<string>(resultList);
             }
 
         }
         #endregion
-        public override string SaveId => $"K45_VW_{serializePrefix}";
+        public override string SaveId => $"K45_VW_{SerializePrefix}";
 
 
     }
 
-    public interface IVWConfigIndexKeyContainer
-    {
-        VWConfigIndex ConfigIndexKey { get; }
-    }
-
-    public interface IVWAssetSelectorExtension : IVWConfigIndexKeyContainer
+    public interface IVWAssetSelectorExtension
     {
         Dictionary<string, string> GetAllBasicAssets();
         VehicleInfo GetAModel();
         bool IsModelCompatible(VehicleInfo vehicleInfo);
 
 
-        List<string> GetAssetList();
+        IEnumerable<string> GetAssetList();
         void AddAsset(string assetId);
         void RemoveAsset(string assetId);
         void UseDefaultAssets();
     }
 
 
-    public sealed class VWVehiclesWealthExtensionLow : VWVehiclesWealthExtension<VWWthDefLow, VWVehiclesWealthExtensionLow> { public override string serializePrefix => "§"; }
-    public sealed class VWVehiclesWealthExtensionMed : VWVehiclesWealthExtension<VWWthDefMed, VWVehiclesWealthExtensionMed> { public override string serializePrefix => "§§"; }
-    public sealed class VWVehiclesWealthExtensionHgh : VWVehiclesWealthExtension<VWWthDefHgh, VWVehiclesWealthExtensionHgh> { public override string serializePrefix => "§§§"; }
+    public sealed class VWVehiclesWealthExtensionLow : VWVehiclesWealthExtension<VWWthDefLow, VWVehiclesWealthExtensionLow> { public override string SerializePrefix => "§"; }
+    public sealed class VWVehiclesWealthExtensionMed : VWVehiclesWealthExtension<VWWthDefMed, VWVehiclesWealthExtensionMed> { public override string SerializePrefix => "§§"; }
+    public sealed class VWVehiclesWealthExtensionHgh : VWVehiclesWealthExtension<VWWthDefHgh, VWVehiclesWealthExtensionHgh> { public override string SerializePrefix => "§§§"; }
 
     public sealed class VWVehicleExtensionUtils
     {
@@ -203,7 +186,7 @@ namespace Klyte.VehicleWealthizer.Extensors
             foreach (Type t in instances)
             {
                 var ext = (IVWVehiclesWealthExtension) ExtensorContainer.instance.Instances[t];
-                result.AppendLine(string.Join("\r\n", ext.Serialize()));
+                result.AppendLine(string.Join("\r\n", ext.SerializeToString()));
             }
 
             return result.ToString();
@@ -223,7 +206,7 @@ namespace Klyte.VehicleWealthizer.Extensors
             foreach (Type t in instances)
             {
                 var ext = (IVWVehiclesWealthExtension) ExtensorContainer.instance.Instances[t];
-                ext.Deserialize(lines);
+                ext.DeserializeFromString(lines);
             }
         }
 
@@ -243,7 +226,8 @@ namespace Klyte.VehicleWealthizer.Extensors
                         var ownerWealth = CitizenWealthDefinition.from(CitizenManager.instance.m_citizens.m_buffer[citizenOwner].WealthLevel);
                         if (ownerWealth != null)
                         {
-                            if (!ownerWealth.GetVehicleExtension().IsModelCompatible(vehicleInfo))
+                            var ext = ownerWealth.GetVehicleExtension();
+                            if (!ext.IsModelCompatible(vehicleInfo))
                             {
                                 Singleton<VehicleManager>.instance.ReleaseVehicle(vehId);
                             }

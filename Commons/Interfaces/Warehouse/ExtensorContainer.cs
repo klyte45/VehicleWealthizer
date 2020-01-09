@@ -36,9 +36,21 @@ namespace Klyte.Commons.Interfaces
                 }
                 using var memoryStream = new MemoryStream(SerializableDataManager.LoadData(basicInstance.SaveId));
                 byte[] storage = memoryStream.ToArray();
-                string content = System.Text.Encoding.UTF8.GetString(storage);
-                LogUtils.DoLog($"{type} DATA => {content}");
-                instance.Instances[type] = basicInstance.Deserialize(type, content);
+                try
+                {
+                    instance.Instances[type] = basicInstance.Deserialize(type, storage) ?? basicInstance;
+                    if (CommonProperties.DebugMode)
+                    {
+                        string content = System.Text.Encoding.UTF8.GetString(storage);
+                        LogUtils.DoLog($"{type} DATA {storage.Length}b => {content}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    string content = System.Text.Encoding.UTF8.GetString(storage);
+                    LogUtils.DoLog($"{type} CORRUPTED DATA! => \nException: {e.Message}\n{e.StackTrace}\nData  {storage.Length}b:\n{content}");
+                    instance.Instances[type] = null;
+                }
             }
         }
 
@@ -53,15 +65,26 @@ namespace Klyte.Commons.Interfaces
                 {
                     continue;
                 }
-                string serialData = instance.Instances[type]?.Serialize();
-                LogUtils.DoLog($"serialData: {serialData ?? "<NULL>"}");
-                if (serialData == null)
+
+
+                byte[] data = instance.Instances[type]?.Serialize();
+                if (CommonProperties.DebugMode)
+                {
+                    string content = System.Text.Encoding.UTF8.GetString(data);
+                    LogUtils.DoLog($"{type} DATA => {content}");
+                }
+                if (data.Length == 0)
                 {
                     return;
                 }
-
-                byte[] data = System.Text.Encoding.UTF8.GetBytes(serialData);
-                SerializableDataManager.SaveData(instance.Instances[type].SaveId, data);
+                try
+                {
+                    SerializableDataManager.SaveData(instance.Instances[type].SaveId, data);
+                }
+                catch (Exception e)
+                {
+                    LogUtils.DoErrorLog($"Exception trying to serialize {type}: {e} -  {e.Message}\n{e.StackTrace} ");
+                }
             }
         }
 

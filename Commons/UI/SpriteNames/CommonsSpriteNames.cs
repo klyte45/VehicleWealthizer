@@ -16,6 +16,10 @@
         K45_Reload,
         K45_Save,
         K45_Copy,
-        K45_Paste
+        K45_Paste,
+        K45_RemoveUnwantedIcon,
+        K45_AbsoluteMode,
+        K45_RelativeMode,
+        K45_MenuPanel_color
     }
 }

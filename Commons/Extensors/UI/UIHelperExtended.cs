@@ -60,12 +60,13 @@ namespace Klyte.Commons.Extensors
             DebugOutputPanel.AddMessage(PluginManager.MessageType.Warning, "Cannot create button with no name or no event");
             return null;
         }
+        public object AddCheckbox(string text, bool defaultValue, OnCheckChanged eventCallback) => AddCheckbox(m_root, text, defaultValue, eventCallback);
 
-        public object AddCheckbox(string text, bool defaultValue, OnCheckChanged eventCallback)
+        public static UICheckBox AddCheckbox(UIComponent root, string text, bool defaultValue, OnCheckChanged eventCallback = null)
         {
-            if (eventCallback != null && !string.IsNullOrEmpty(text))
+            if (!string.IsNullOrEmpty(text))
             {
-                var uICheckBox = m_root.AttachUIComponent(UITemplateManager.GetAsGameObject(kCheckBoxTemplate)) as UICheckBox;
+                var uICheckBox = root.AttachUIComponent(UITemplateManager.GetAsGameObject(kCheckBoxTemplate)) as UICheckBox;
                 uICheckBox.text = text;
                 uICheckBox.isChecked = defaultValue;
                 uICheckBox.eventCheckChanged += delegate (UIComponent c, bool isChecked)
@@ -74,15 +75,16 @@ namespace Klyte.Commons.Extensors
                 };
                 return uICheckBox;
             }
-            DebugOutputPanel.AddMessage(PluginManager.MessageType.Warning, "Cannot create checkbox with no name or no event");
+            DebugOutputPanel.AddMessage(PluginManager.MessageType.Warning, "Cannot create checkbox with no name");
             return null;
         }
 
-        public UICheckBox AddCheckboxLocale(string text, bool defaultValue, OnCheckChanged eventCallback = null)
+        public UICheckBox AddCheckboxLocale(string text, bool defaultValue, OnCheckChanged eventCallback = null) => AddCheckboxLocale(m_root, text, defaultValue, eventCallback);
+        public static UICheckBox AddCheckboxLocale(UIComponent parent, string text, bool defaultValue, OnCheckChanged eventCallback = null)
         {
             if (!string.IsNullOrEmpty(text))
             {
-                var uICheckBox = m_root.AttachUIComponent(UITemplateManager.GetAsGameObject(kCheckBoxTemplate)) as UICheckBox;
+                var uICheckBox = parent.AttachUIComponent(UITemplateManager.GetAsGameObject(kCheckBoxTemplate)) as UICheckBox;
                 uICheckBox.label.isLocalized = true;
                 uICheckBox.label.localeID = text;
                 uICheckBox.isChecked = defaultValue;
@@ -189,16 +191,20 @@ namespace Klyte.Commons.Extensors
 
         private UIDropDown AddDropdownBaseLocalized(string text, string[] options, OnDropdownSelectionChanged eventCallback, int defaultSelection, bool limitLabelByPanelWidth = false) => CloneBasicDropDownLocalized(text, options, eventCallback, defaultSelection, m_root, limitLabelByPanelWidth);
 
-        public static UIDropDown CloneBasicDropDownLocalized(string text, string[] options, OnDropdownSelectionChanged eventCallback, int defaultSelection, UIComponent parent, bool limitLabelByPanelWidth = false)
+        public static UIDropDown CloneBasicDropDownLocalized(string text, string[] options, OnDropdownSelectionChanged eventCallback, int defaultSelection, UIComponent parent, bool limitLabelByPanelWidth = false) => CloneBasicDropDownLocalized(text, options, eventCallback, defaultSelection, parent, out _, out _, limitLabelByPanelWidth);
+        public static UIDropDown CloneBasicDropDownLocalized(string text, string[] options, OnDropdownSelectionChanged eventCallback, int defaultSelection, UIComponent parent, out UILabel label, out UIPanel container, bool limitLabelByPanelWidth = false)
         {
             if (eventCallback != null && !string.IsNullOrEmpty(text))
             {
-                var uIPanel = parent.AttachUIComponent(UITemplateManager.GetAsGameObject(kDropdownTemplate)) as UIPanel;
-                uIPanel.Find<UILabel>("Label").localeID = text;
-                uIPanel.Find<UILabel>("Label").isLocalized = true;
+                container = parent.AttachUIComponent(UITemplateManager.GetAsGameObject(kDropdownTemplate)) as UIPanel;
+                label = container.Find<UILabel>("Label");
+                label.localeID = text;
+                label.isLocalized = true;
                 if (limitLabelByPanelWidth)
-                { KlyteMonoUtils.LimitWidth(uIPanel.Find<UILabel>("Label"), (uint) uIPanel.width); }
-                UIDropDown uIDropDown = uIPanel.Find<UIDropDown>("Dropdown");
+                {
+                    KlyteMonoUtils.LimitWidth(label, (uint) container.width);
+                }
+                UIDropDown uIDropDown = container.Find<UIDropDown>("Dropdown");
                 uIDropDown.items = options;
                 uIDropDown.selectedIndex = defaultSelection;
                 uIDropDown.eventSelectedIndexChanged += delegate (UIComponent c, int sel)
@@ -208,6 +214,8 @@ namespace Klyte.Commons.Extensors
                 return uIDropDown;
             }
             DebugOutputPanel.AddMessage(PluginManager.MessageType.Warning, "Cannot create dropdown with no name or no event");
+            label = null;
+            container = null;
             return null;
         }
 
@@ -305,14 +313,21 @@ namespace Klyte.Commons.Extensors
             return null;
         }
 
+        public static UITextField AddTextfield(UIComponent parent, string text, string defaultContent, out UILabel label, out UIPanel panel)
+        {
+            panel = parent.AttachUIComponent(UITemplateManager.GetAsGameObject(kTextfieldTemplate)) as UIPanel;
+            label = panel.Find<UILabel>("Label");
+            label.text = text;
+            UITextField uITextField = panel.Find<UITextField>("Text Field");
+            uITextField.text = defaultContent;
+            return uITextField;
+        }
+
         public object AddTextfield(string text, string defaultContent, OnTextChanged eventChangedCallback, OnTextSubmitted eventSubmittedCallback)
         {
             if ((eventChangedCallback != null || eventSubmittedCallback != null) && !string.IsNullOrEmpty(text))
             {
-                var uIPanel = m_root.AttachUIComponent(UITemplateManager.GetAsGameObject(kTextfieldTemplate)) as UIPanel;
-                uIPanel.Find<UILabel>("Label").text = text;
-                UITextField uITextField = uIPanel.Find<UITextField>("Text Field");
-                uITextField.text = defaultContent;
+                UITextField uITextField = AddTextfield(m_root, text, defaultContent, out _, out _);
                 uITextField.eventTextChanged += delegate (UIComponent c, string sel)
                 {
                     eventChangedCallback?.Invoke(sel);
@@ -432,7 +447,7 @@ namespace Klyte.Commons.Extensors
             }
             DebugOutputPanel.AddMessage(PluginManager.MessageType.Warning, "Cannot create dropdown with no name or no event");
             return null;
-        }        
+        }
 
         public UITextField AddTextField(string name, OnTextChanged eventCallback, string defaultValue = "", OnTextSubmitted eventSubmit = null) => (UITextField) AddTextfield(name, defaultValue, eventCallback, eventSubmit);
 
@@ -478,21 +493,23 @@ namespace Klyte.Commons.Extensors
 
         }
 
-        public UIColorField AddColorPicker(string name, Color defaultValue, OnColorChanged eventCallback) => AddColorPicker(name, defaultValue, eventCallback, out _);
+        public UIColorField AddColorPicker(string name, Color defaultValue, OnColorChanged eventCallback) => AddColorPicker(name, defaultValue, eventCallback, out _, out _);
+        public UIColorField AddColorPicker(string name, Color defaultValue, OnColorChanged eventCallback, out UILabel title) => AddColorPicker(name, defaultValue, eventCallback, out title, out _);
 
-        public UIColorField AddColorPicker(string name, Color defaultValue, OnColorChanged eventCallback, out UILabel title)
+        public UIColorField AddColorPicker(string name, Color defaultValue, OnColorChanged eventCallback, out UILabel title, out UIPanel container)
         {
             if (eventCallback != null && !string.IsNullOrEmpty(name))
             {
-                var panel = m_root.AttachUIComponent(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate)) as UIPanel;
-                panel.name = "DropDownColorSelector";
-                title = panel.Find<UILabel>("Label");
+                container = m_root.AttachUIComponent(UITemplateManager.GetAsGameObject(UIHelperExtension.kDropdownTemplate)) as UIPanel;
+                container.name = "DropDownColorSelector";
+                title = container.Find<UILabel>("Label");
                 title.text = name;
-                panel.autoLayoutDirection = LayoutDirection.Horizontal;
-                panel.wrapLayout = false;
-                panel.autoFitChildrenVertically = true;
-                GameObject.Destroy(panel.Find<UIDropDown>("Dropdown").gameObject);
-                UIColorField colorField = KlyteMonoUtils.CreateColorField(panel);
+                title.padding.top = 8;
+                container.autoLayoutDirection = LayoutDirection.Horizontal;
+                container.wrapLayout = false;
+                container.autoFitChildrenVertically = true;
+                GameObject.Destroy(container.Find<UIDropDown>("Dropdown").gameObject);
+                UIColorField colorField = KlyteMonoUtils.CreateColorField(container);
                 colorField.selectedColor = defaultValue;
 
                 colorField.eventSelectedColorReleased += (cp, value) => eventCallback(value);
@@ -501,16 +518,20 @@ namespace Klyte.Commons.Extensors
             }
             DebugOutputPanel.AddMessage(PluginManager.MessageType.Warning, "Cannot create colorPicker with no name or no event");
             title = null;
+            container = null;
             return null;
         }
 
-        public UIColorField AddColorPickerNoLabel(string name, Color defaultValue, OnColorChanged eventCallback)
+        public UIColorField AddColorPickerNoLabel(string name, Color defaultValue, OnColorChanged eventCallback = null)
         {
-            if (eventCallback != null && !string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(name))
             {
                 UIColorField colorField = KlyteMonoUtils.CreateColorField(m_root);
 
-                colorField.eventSelectedColorReleased += (cp, value) => eventCallback(value);
+                if (eventCallback != null)
+                {
+                    colorField.eventSelectedColorReleased += (cp, value) => eventCallback(value);
+                }
 
                 colorField.selectedColor = defaultValue;
 

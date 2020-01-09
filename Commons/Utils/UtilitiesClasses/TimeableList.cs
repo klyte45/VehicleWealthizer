@@ -80,6 +80,16 @@ namespace Klyte.Commons.Utils
             }
         }
 
+        public Tuple<TValue, int> GetAtHourExact(float hour)
+        {
+            if (m_hourTable == null)
+            {
+                RebuildHourTable();
+            }
+            int fullHour = (int) hour;
+            return m_hourTable[fullHour];
+        }
+
         private class ITimeableComparer : IEqualityComparer<TValue>
         {
             public bool Equals(TValue x, TValue y) => x.HourOfDay == y.HourOfDay;
@@ -99,16 +109,27 @@ namespace Klyte.Commons.Utils
 
         internal TValue this[int idx] => m_items[idx];
 
-        internal void Remove(TValue entry)
+        private void Remove(TValue entry)
         {
-            m_items.Remove(entry);
             entry.OnEntryChanged -= CleanCache;
+            m_items.Remove(entry);
+            entry.OnEntryChanged += CleanCache;
+        }
+        internal void RemoveAtHour(int hour)
+        {
+            if (hour < 0 || hour > 23)
+            {
+                return;
+            }
+            TValue entry = m_items.Where(x => x.HourOfDay == hour).FirstOrDefault();
+            if (entry == default)
+            {
+                return;
+            }
+            Remove(entry);
         }
 
-        private void CleanCache(TValue dirtyObj)
-        {
-            m_hourTable = null;
-        }
+        private void CleanCache(TValue dirtyObj) => m_hourTable = null;
 
         private void RebuildHourTable()
         {
