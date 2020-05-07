@@ -1,3 +1,5 @@
-﻿v2
-	- Full converted to Gen 5
-	- Now all information of the models selected are saved inside the savegames
+﻿<color #AA44FF>VWv3.0</color>
+	- Fixed: Taxi are not picking up passenger
+	- Fixed TMPE compatibility
+	- Tourists were removed from the system - so their vehicles aren't managed by this mod
+	<color #FFFF00>- Re-enabled the "Back to the main menu" button</color>

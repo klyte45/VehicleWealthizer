@@ -97,7 +97,7 @@
             panel.width = 450;
             panel.eventClick += (x, y) =>
             {
-                VWPanel.instance.previewInfo = info;
+                VWPanel.Instance.previewInfo = info;
             };
 
             base.component.eventZOrderChanged += delegate (UIComponent c, int r)

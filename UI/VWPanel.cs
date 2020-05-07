@@ -11,59 +11,31 @@ using UnityEngine;
 namespace Klyte.VehicleWealthizer.UI
 {
 
-    public class VWPanel : UICustomControl
+    public class VWPanel : BasicKPanel<VehicleWealthizerMod, VWController, VWPanel>
     {
-        private const int NUM_SERVICES = 0;
-        private static VWPanel m_instance;
-        private UIPanel controlContainer;
-
         public ExtensorContainer extensorContainer => ExtensorContainer.instance;
-        public static VWPanel instance => m_instance;
-        public UIPanel m_mainPanel { get; private set; }
 
 
 
         #region Awake
-        private void Awake()
+        protected override void AwakeActions()
         {
-            m_instance = this;
-            controlContainer = GetComponent<UIPanel>();
-            controlContainer.area = new Vector4(0, 0, 0, 0);
-            controlContainer.isVisible = false;
-            controlContainer.name = "VWPanel";
+            KlyteMonoUtils.CreateScrollPanel(MainPanel, out _, out _, 450, base.MainPanel.height - 120, new Vector3(10, 110));
 
-
-            KlyteMonoUtils.CreateUIElement(out UIPanel _mainPanel, GetComponent<UIPanel>().transform, "VWListPanel", new Vector4(0, 0, 885, controlContainer.parent.height));
-            m_mainPanel = _mainPanel;
-            m_mainPanel.backgroundSprite = "MenuPanel2";
-
-
-
-            CreateTitleBar();
-            KlyteMonoUtils.CreateScrollPanel(_mainPanel, out UIScrollablePanel scrollablePanel, out UIScrollbar scrollbar, 450, controlContainer.height - 120, new Vector3(10, 110));
-
-            _mainPanel.gameObject.AddComponent<VWVehicleList>();
-            CreateTitleRow(out UIPanel title, _mainPanel);
+            MainPanel.gameObject.AddComponent<VWVehicleList>();
+            CreateTitleRow(MainPanel);
 
             SetPreviewWindow();
             CreateRemoveUnwantedButton();
 
-            KlyteMonoUtils.CreateUIElement(out UIPanel exportPanel, m_mainPanel.transform, "ImportExportPanel", new Vector4(480, 275, 380, 275));
+            KlyteMonoUtils.CreateUIElement(out UIPanel exportPanel, MainPanel.transform, "ImportExportPanel", new Vector4(480, 275, 380, 275));
             exportPanel.gameObject.AddComponent<VWConfigFilesPanel>();
 
         }
 
-        private void OnOpenClosePanel(UIComponent component, bool value)
+        private void CreateTitleRow(UIComponent parent)
         {
-            if (value)
-            {
-                VehicleWealthizerMod.Instance.ShowVersionInfoPopup();
-            }
-        }
-
-        private void CreateTitleRow(out UIPanel titleLine, UIComponent parent)
-        {
-            KlyteMonoUtils.CreateUIElement(out titleLine, parent.transform, "VWtitleline", new Vector4(5, 60, 500, 40));
+            KlyteMonoUtils.CreateUIElement(out UIPanel titleLine, parent.transform, "VWtitleline", new Vector4(5, 60, 500, 40));
 
             KlyteMonoUtils.CreateUIElement(out UILabel modelNameLabel, titleLine.transform, "districtNameLabel");
             modelNameLabel.autoSize = false;
@@ -94,23 +66,13 @@ namespace Klyte.VehicleWealthizer.UI
             highWealth.eventClick += (x, y) => { VWVehicleList.instance.SetSorting(VWVehicleList.SortCriterion.HGHWTH); };
         }
 
-        private void CreateTitleBar()
-        {
-            KlyteMonoUtils.CreateUIElement(out UILabel titlebar, m_mainPanel.transform, "VWPanel", new Vector4(75, 10, m_mainPanel.width - 150, 20));
-            titlebar.autoSize = false;
-            titlebar.text = "Vehicle Wealthizer v" + VehicleWealthizerMod.Version;
-            titlebar.textAlignment = UIHorizontalAlignment.Center;
-
-            KlyteMonoUtils.CreateUIElement(out UISprite logo, m_mainPanel.transform, "VWLogo", new Vector4(22, 5f, 32, 32));
-            logo.spriteName = "K45_VW_Icon";
-        }
         #endregion
 
-        private void Update() => RotateCamera();
+        public void Update() => RotateCamera();
 
         private void CreateRemoveUnwantedButton()
         {
-            KlyteMonoUtils.CreateUIElement<UIButton>(out UIButton removeUndesired, m_mainPanel.transform);
+            KlyteMonoUtils.CreateUIElement<UIButton>(out UIButton removeUndesired, MainPanel.transform);
             removeUndesired.relativePosition = new Vector3(470f, 65f);
             removeUndesired.textScale = 0.6f;
             removeUndesired.width = 20;
@@ -147,23 +109,27 @@ namespace Klyte.VehicleWealthizer.UI
             }
         }
 
+        public override float PanelWidth => 885;
+
+        public override float PanelHeight => GetComponentInParent<UIComponent>().height;
+
         private void SetPreviewWindow()
         {
-            KlyteMonoUtils.CreateUIElement(out m_previewPanel, m_mainPanel.transform);
+            KlyteMonoUtils.CreateUIElement(out m_previewPanel, MainPanel.transform);
             m_previewPanel.backgroundSprite = "GenericPanel";
-            m_previewPanel.width = m_mainPanel.width - 520f;
+            m_previewPanel.width = MainPanel.width - 520f;
             m_previewPanel.height = m_previewPanel.width / 2;
             m_previewPanel.relativePosition = new Vector3(510, 80);
             KlyteMonoUtils.CreateUIElement(out m_preview, m_previewPanel.transform);
             m_preview.size = m_previewPanel.size;
             m_preview.relativePosition = Vector3.zero;
-            KlyteMonoUtils.CreateElement(out m_previewRenderer, m_mainPanel.transform);
+            KlyteMonoUtils.CreateElement(out m_previewRenderer, MainPanel.transform);
             m_previewRenderer.Size = m_preview.size * 2f;
             m_preview.texture = m_previewRenderer.Texture;
             m_previewRenderer.Zoom = 3;
             m_previewRenderer.CameraRotation = 40;
 
-            KlyteMonoUtils.CreateUIElement(out m_previewTitle, m_mainPanel.transform, "previewTitle", new Vector4(510, 50, m_previewPanel.width, 30));
+            KlyteMonoUtils.CreateUIElement(out m_previewTitle, MainPanel.transform, "previewTitle", new Vector4(510, 50, m_previewPanel.width, 30));
             m_previewTitle.textAlignment = UIHorizontalAlignment.Center;
         }
 
@@ -186,5 +152,6 @@ namespace Klyte.VehicleWealthizer.UI
             m_previewPanel.isVisible = true;
             m_previewRenderer.RenderVehicle(m_lastInfo, Color.HSVToRGB(Math.Abs(m_previewRenderer.CameraRotation) / 360f, .5f, .5f), true);
         }
+
     }
 }

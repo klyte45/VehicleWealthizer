@@ -31,13 +31,13 @@ namespace Klyte.VehicleWealthizer.Overrides
                 MethodInfo to2 = typeof(ResidentAIOverrides).GetMethod("CustomGetVehicleInfoPost", RedirectorUtils.allFlags);
                 MethodInfo from3 = customResident.GetMethod("CustomGetVehicleInfo");
                 LogUtils.DoLog($"REDIRECT VW {from3}=>{to}");
-                RedirectorInstance.AddRedirect(from3, null, to);
+                RedirectorInstance.AddRedirect(from3, null, to2);
             }
         }
 
-        protected static void GetVehicleInfoPost(ResidentAI __instance, ushort instanceID, ref CitizenInstance citizenData, ref VehicleInfo trailer, ref VehicleInfo __result)
+        protected static void GetVehicleInfoPost(ref CitizenInstance citizenData, ref VehicleInfo __result)
         {
-            if (__result == null || __result.m_vehicleType != VehicleInfo.VehicleType.Car || (citizenData.m_flags & CitizenInstance.Flags.OnTour) != CitizenInstance.Flags.None)
+            if (__result == null || __result.m_vehicleType != VehicleInfo.VehicleType.Car || __result.m_class.m_service == ItemClass.Service.PublicTransport || (citizenData.m_flags & CitizenInstance.Flags.OnTour) != CitizenInstance.Flags.None)
             {
                 return;
             }
@@ -54,13 +54,6 @@ namespace Klyte.VehicleWealthizer.Overrides
             }
         }
 
-        public static void CustomGetVehicleInfoPost(ResidentAI __instance, ushort instanceID, ref CitizenInstance citizenData, bool forceCar, ref VehicleInfo trailer, ref VehicleInfo __result)
-        {
-            if (forceCar)
-            {
-                return;
-            }
-            GetVehicleInfoPost(__instance, instanceID, ref citizenData, ref trailer, ref __result);
-        }
+        public static void CustomGetVehicleInfoPost(ref CitizenInstance citizenData, ref VehicleInfo __result) => GetVehicleInfoPost(ref citizenData, ref __result);
     }
 }
