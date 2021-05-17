@@ -4,7 +4,7 @@ using Klyte.VehicleWealthizer.UI;
 using System.IO;
 using System.Reflection;
 
-[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyVersion("3.0.0.1")]
 namespace Klyte.VehicleWealthizer
 {
     public class VehicleWealthizerMod : BasicIUserMod<VehicleWealthizerMod, VWController, VWPanel>
@@ -16,7 +16,7 @@ namespace Klyte.VehicleWealthizer
         public static string ImportExportWealthFolder { get; } = FOLDER_PATH + Path.DirectorySeparatorChar + IMPORT_EXPORT_SUBFOLDER_NAME;
 
         public override string SimpleName => "Vehicle Wealthizer";
-
+         
         public override string Description => "Allow categorize vehicles by citizen wealth.";
 
         public override string IconName => "K45_VW_Icon";

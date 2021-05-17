@@ -3,3 +3,5 @@
 	- Fixed TMPE compatibility
 	- Tourists were removed from the system - so their vehicles aren't managed by this mod
 	<color #FFFF00>- Re-enabled the "Back to the main menu" button</color>
+	
+<color yellow>r1 (17/MAY/21):</color> Fixing garbled text issues when loading the city.
