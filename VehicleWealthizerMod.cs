@@ -4,7 +4,7 @@ using Klyte.VehicleWealthizer.UI;
 using System.IO;
 using System.Reflection;
 
-[assembly: AssemblyVersion("3.0.0.1")]
+[assembly: AssemblyVersion("3.0.0.2")]
 namespace Klyte.VehicleWealthizer
 {
     public class VehicleWealthizerMod : BasicIUserMod<VehicleWealthizerMod, VWController, VWPanel>
